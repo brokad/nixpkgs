@@ -532,6 +532,21 @@ let
     };
   };
 
+  Applify = buildPerlPackage {
+    pname = "Applify";
+    version = "0.21";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/J/JH/JHTHORSEN/Applify-0.21.tar.gz";
+      sha256 = "e34bc64c12c42369af6db7d17e3e20059b9d97ed50f8e487bf610008525eb84d";
+    };
+    meta = {
+      homepage = "https://github.com/jhthorsen/applify";
+      description = "Write object oriented scripts with ease";
+      license = stdenv.lib.licenses.artistic2;
+      maintainers = [ maintainers.sgo ];
+    };
+  };
+
   Appperlbrew = buildPerlModule {
     pname = "App-perlbrew";
     version = "0.88";
@@ -860,6 +875,39 @@ let
     meta = {
       description = "SASL Authentication framework";
       license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+    };
+  };
+
+  AuthenSASLSASLprep = buildPerlModule {
+    pname = "Authen-SASL-SASLprep";
+    version = "1.100";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/C/CF/CFAERBER/Authen-SASL-SASLprep-1.100.tar.gz";
+      sha256 = "a4cccc34bb3f53acf0ba78c9fc61af8d156d109d1c10487ba5988a55077d1f70";
+    };
+    buildInputs = [ TestNoWarnings ];
+    propagatedBuildInputs = [ UnicodeStringprep ];
+    meta = {
+      description = "A Stringprep Profile for User Names and Passwords (RFC 4013)";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+      maintainers = [ maintainers.sgo ];
+    };
+  };
+
+  AuthenSCRAM = buildPerlPackage {
+    pname = "Authen-SCRAM";
+    version = "0.011";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/D/DA/DAGOLDEN/Authen-SCRAM-0.011.tar.gz";
+      sha256 = "45108c239a7373d00941dcf0d171acd03e7c16a63ce6f7d9568ff052b17cf5a8";
+    };
+    buildInputs = [ TestFailWarnings TestFatal ];
+    propagatedBuildInputs = [ AuthenSASLSASLprep CryptURandom Moo PBKDF2Tiny TryTiny TypeTiny namespaceclean ];
+    meta = {
+      homepage = "https://github.com/dagolden/Authen-SCRAM";
+      description = "Salted Challenge Response Authentication Mechanism (RFC 5802)";
+      license = stdenv.lib.licenses.asl20;
+      maintainers = [ maintainers.sgo ];
     };
   };
 
@@ -3616,6 +3664,20 @@ let
     src = fetchurl {
       url = mirror://cpan/authors/id/B/BO/BORISZ/Crypt-UnixCrypt_XS-0.11.tar.gz;
       sha256 = "1ajg3x6kwxy4x9p3nw1j36qjxpjvdpi9wkca5gfd86y9q8939sv2";
+    };
+  };
+
+  CryptURandom = buildPerlPackage {
+    pname = "Crypt-URandom";
+    version = "0.36";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/D/DD/DDICK/Crypt-URandom-0.36.tar.gz";
+      sha256 = "81fec9921adc5d3c91cbe0ad8cb2bb89b045c4fb0de9cb3c43f17e58e477f8a1";
+    };
+    meta = {
+      description = "Provide non blocking randomness";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+      maintainers = [ maintainers.sgo ];
     };
   };
 
@@ -9708,10 +9770,10 @@ let
 
   JSONValidator = buildPerlPackage {
     pname = "JSON-Validator";
-    version = "3.18";
+    version = "3.23";
     src = fetchurl {
-      url = mirror://cpan/authors/id/J/JH/JHTHORSEN/JSON-Validator-3.18.tar.gz;
-      sha256 = "a62474311b57c0a01ad06a5e340ec10d3723d74fd019304c769ffc7a61b5a47a";
+      url = "mirror://cpan/authors/id/J/JH/JHTHORSEN/JSON-Validator-3.23.tar.gz";
+      sha256 = "1fzy2z7mkg5vgcjvykh5ay8yg6q496wi14x9wp5hc9agplsq7f0s";
     };
     buildInputs = [ TestDeep ];
     propagatedBuildInputs = [ DataValidateDomain DataValidateIP Mojolicious NetIDNEncode YAMLLibYAML ];
@@ -13120,6 +13182,11 @@ let
       url = mirror://cpan/authors/id/A/AB/ABH/Mozilla-CA-20180117.tar.gz;
       sha256 = "f2cc9fbe119f756313f321e0d9f1fac0859f8f154ac9d75b1a264c1afdf4e406";
     };
+
+    postPatch = ''
+      ln -s --force ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt lib/Mozilla/CA/cacert.pem
+    '';
+
     meta = {
       description = "Mozilla's CA cert bundle in PEM format";
       license = stdenv.lib.licenses.mpl20;
@@ -14058,6 +14125,22 @@ let
     };
   };
 
+  OpenAPIClient = buildPerlPackage rec {
+    pname = "OpenAPI-Client";
+    version = "0.24";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/J/JH/JHTHORSEN/OpenAPI-Client-0.24.tar.gz";
+      sha256 = "2420a2d1a9bc24a644c9ba12d77f1252ac2209ef0ac5a432153fe49c840faf28";
+    };
+    propagatedBuildInputs = [ JSONValidator MojoliciousPluginOpenAPI ];
+    meta = {
+      homepage = "https://github.com/jhthorsen/openapi-client";
+      description = "A client for talking to an Open API powered server";
+      license = stdenv.lib.licenses.artistic2;
+      maintainers = [ maintainers.sgo ];
+    };
+  };
+
   OpenGL = buildPerlPackage rec {
     pname = "OpenGL";
     version = "0.70";
@@ -14516,6 +14599,21 @@ let
     src = fetchurl {
       url = mirror://cpan/authors/id/X/XS/XSAWYERX/PathTools-3.75.tar.gz;
       sha256 = "a558503aa6b1f8c727c0073339081a77888606aa701ada1ad62dd9d8c3f945a2";
+    };
+  };
+
+  PBKDF2Tiny = buildPerlPackage {
+    pname = "PBKDF2-Tiny";
+    version = "0.005";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/D/DA/DAGOLDEN/PBKDF2-Tiny-0.005.tar.gz";
+      sha256 = "b4e21dc59b30265eaaa41b705087ec03447d9c655a14ac40ff46e4de29eabf8e";
+    };
+    meta = {
+      homepage = "https://github.com/dagolden/PBKDF2-Tiny";
+      description = "Minimalist PBKDF2 (RFC 2898) with HMAC-SHA1 or HMAC-SHA2";
+      license = stdenv.lib.licenses.asl20;
+      maintainers = [ maintainers.sgo ];
     };
   };
 
@@ -19123,7 +19221,7 @@ let
       install_name_tool -change "$oldPath" "$newPath" "$out/bin/biblex"
       install_name_tool -change "$oldPath" "$newPath" "$out/bin/bibparse"
       install_name_tool -change "$oldPath" "$newPath" "$out/bin/dumpnames"
-      install_name_tool -change "$oldPath" "$newPath" "$out/${perl.libPrefix}/${perl.version}/darwin-2level/auto/Text/BibTeX/BibTeX.bundle"
+      install_name_tool -change "$oldPath" "$newPath" "$out/${perl.libPrefix}/${perl.version}/darwin"*"-2level/auto/Text/BibTeX/BibTeX.bundle"
     '';
     meta = {
       description = "Interface to read and parse BibTeX files";
@@ -19274,6 +19372,20 @@ let
       license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
     };
     buildInputs = [ FileFindRule TestPod TestPodCoverage ];
+  };
+
+  TextLorem = buildPerlModule {
+    pname = "Text-Lorem";
+    version = "0.3";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/A/AD/ADEOLA/Text-Lorem-0.3.tar.gz";
+      sha256 = "64bb636fb21213101a646b414ecbdc1b55edf905cbcdc7f5d24774ec5061fe2d";
+    };
+    meta = {
+      description = "Generate random Latin looking text";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+      maintainers = [ maintainers.sgo ];
+    };
   };
 
   TestManifest = buildPerlPackage {
@@ -20193,6 +20305,21 @@ let
     };
   };
 
+  UnicodeStringprep = buildPerlModule {
+    pname = "Unicode-Stringprep";
+    version = "1.105";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/C/CF/CFAERBER/Unicode-Stringprep-1.105.tar.gz";
+      sha256 = "e6bebbc58408231fd1317db9102449b3e7da4fa437e79f637382d36313efd011";
+    };
+    buildInputs = [ TestNoWarnings ];
+    meta = {
+      description = "Preparation of Internationalized Strings (RFC 3454)";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+      maintainers = [ maintainers.sgo ];
+    };
+  };
+
   UnixGetrusage = buildPerlPackage {
     pname = "Unix-Getrusage";
     version = "0.03";
@@ -21006,6 +21133,10 @@ let
       url = mirror://cpan/authors/id/M/MI/MIROD/XML-Twig-3.52.tar.gz;
       sha256 = "1bc0hrz4jp6199hi29sdxmb9gyy45whla9hd19yqfasgq8k5ixzy";
     };
+    postInstall = ''
+      mkdir -p $out/bin
+      cp tools/xml_grep/xml_grep $out/bin
+    '';
     propagatedBuildInputs = [ XMLParser ];
     doCheck = false;  # requires lots of extra packages
   };
