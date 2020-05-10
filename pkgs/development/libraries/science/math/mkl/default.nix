@@ -111,7 +111,14 @@ in stdenvNoCC.mkDerivation {
       cp -r opt/intel/compilers_and_libraries_${version}/linux/compiler/lib/intel64_lin/*.so* $out/lib/
       cp -r opt/intel/compilers_and_libraries_${version}/linux/mkl/lib/intel64_lin/*.so* $out/lib/
       cp -r opt/intel/compilers_and_libraries_${version}/linux/mkl/bin/pkgconfig/*dynamic*.pc $out/lib/pkgconfig
-    '');
+    '') + ''
+
+    # Setup symlinks for blas / lapack
+    ln -s $out/lib/libmkl_rt${stdenvNoCC.hostPlatform.extensions.sharedLibrary} $out/lib/libblas${stdenvNoCC.hostPlatform.extensions.sharedLibrary}${stdenvNoCC.lib.optionalString stdenvNoCC.hostPlatform.isLinux ".3"}
+    ln -s $out/lib/libmkl_rt${stdenvNoCC.hostPlatform.extensions.sharedLibrary} $out/lib/libcblas${stdenvNoCC.hostPlatform.extensions.sharedLibrary}${stdenvNoCC.lib.optionalString stdenvNoCC.hostPlatform.isLinux ".3"}
+    ln -s $out/lib/libmkl_rt${stdenvNoCC.hostPlatform.extensions.sharedLibrary} $out/lib/liblapack${stdenvNoCC.hostPlatform.extensions.sharedLibrary}${stdenvNoCC.lib.optionalString stdenvNoCC.hostPlatform.isLinux ".3"}
+    ln -s $out/lib/libmkl_rt${stdenvNoCC.hostPlatform.extensions.sharedLibrary} $out/lib/liblapacke${stdenvNoCC.hostPlatform.extensions.sharedLibrary}${stdenvNoCC.lib.optionalString stdenvNoCC.hostPlatform.isLinux ".3"}
+  '';
 
   # fixDarwinDylibName fails for libmkl_cdft_core.dylib because the
   # larger updated load commands do not fit. Use install_name_tool

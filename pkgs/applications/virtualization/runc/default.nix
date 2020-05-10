@@ -22,9 +22,7 @@ buildGoPackage rec {
   };
 
   goPackagePath = "github.com/opencontainers/runc";
-  outputs = [ "bin" "out" "man" ];
-
-  hardeningDisable = [ "fortify" ];
+  outputs = [ "out" "man" ];
 
   nativeBuildInputs = [ go-md2man installShellFiles pkg-config which ];
   buildInputs = [ libseccomp libapparmor apparmor-parser ];
@@ -40,7 +38,7 @@ buildGoPackage rec {
   '';
 
   installPhase = ''
-    install -Dm755 runc $bin/bin/runc
+    install -Dm755 runc $out/bin/runc
     installManPage man/*/*
   '';
 
