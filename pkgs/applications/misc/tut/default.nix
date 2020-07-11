@@ -2,7 +2,7 @@
 
 buildGoPackage rec {
   pname = "tut";
-  version = "0.0.7";
+  version = "0.0.10";
 
   goPackagePath = "github.com/RasmusLindroth/tut";
   goDeps = ./deps.nix;
@@ -11,7 +11,7 @@ buildGoPackage rec {
     owner = "RasmusLindroth";
     repo = pname;
     rev = version;
-    sha256 = "1v1cvdsrxz1yj2vibx3iapw17ngfihjkr62zhxsn1msb77xyd7lb";
+    sha256 = "09l6dmzrvcpix3wg4djs6zk3ql6b6lfhd8z9aglbi6fix4pm8565";
   };
 
   meta = with stdenv.lib; {

@@ -4,7 +4,7 @@
 , curl, libmms
 # input plugins
 , libmad, taglib, libvorbis, libogg, flac, libmpcdec, libmodplug, libsndfile
-, libcdio, cdparanoia, libcddb, faad2, ffmpeg, wildmidi
+, libcdio, cdparanoia, libcddb, faad2, ffmpeg_3, wildmidi
 # output plugins
 , alsaLib, libpulseaudio
 # effect plugins
@@ -29,11 +29,11 @@
 # handle that.
 
 mkDerivation rec {
-  name = "qmmp-1.3.7";
+  name = "qmmp-1.4.0";
 
   src = fetchurl {
     url = "http://qmmp.ylsoftware.com/files/${name}.tar.bz2";
-    sha256 = "13mk8p7bfl3fkavpqyhpcxkxb8a4f5d4qc1lasyf7wls3ghrdag7";
+    sha256 = "13rhnk55d44svksl13w23w2qkfpkq4mc0jy5mi89nzqkzshwvfd8";
   };
 
   nativeBuildInputs = [ cmake pkgconfig ];
@@ -44,7 +44,7 @@ mkDerivation rec {
       curl libmms
       # input plugins
       libmad taglib libvorbis libogg flac libmpcdec libmodplug libsndfile
-      libcdio cdparanoia libcddb faad2 ffmpeg wildmidi
+      libcdio cdparanoia libcddb faad2 ffmpeg_3 wildmidi
       # output plugins
       alsaLib libpulseaudio
       # effect plugins
