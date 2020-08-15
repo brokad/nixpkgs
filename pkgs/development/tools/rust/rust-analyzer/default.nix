@@ -2,10 +2,10 @@
 
 {
   rust-analyzer-unwrapped = callPackage ./generic.nix rec {
-    rev = "2020-06-08";
+    rev = "2020-08-10";
     version = "unstable-${rev}";
-    sha256 = "0ywwsb717d1rwcy2yij58sj123pan0fb80sbsiqqprcln0aaspip";
-    cargoSha256 = "1c6rmrhx7q4qcanr26yzlwc2rp1hh55m80jn56hy6hfcvwcdaij4";
+    sha256 = "0hf9gpvgq7whrc5gnfhc0wjqddp3xpi3azvdccb4yql2pcznz3rh";
+    cargoSha256 = "1bwch08y2av7aj2l5pvhdxdq24c8favxppz5zcd88rx4brlwn2bq";
   };
 
   rust-analyzer = callPackage ./wrapper.nix {} {

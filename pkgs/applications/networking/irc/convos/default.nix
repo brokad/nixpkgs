@@ -6,13 +6,13 @@ with stdenv.lib;
 
 perlPackages.buildPerlPackage rec {
   pname = "convos";
-  version = "4.22";
+  version = "4.29";
 
-  src = fetchFromGitHub rec {
+  src = fetchFromGitHub {
     owner = "Nordaaker";
     repo = pname;
     rev = version;
-    sha256 = "0a5wq88ncbn7kwcw3z4wdl1wxmx5vq5a7crb1bvbvskgwwy8zfx8";
+    sha256 = "07m9lhwgqq77hi4n2zrya7n8apkjv8xi166bxa0n7pnlknlp74ar";
   };
 
   nativeBuildInputs = [ makeWrapper ]
@@ -32,16 +32,16 @@ perlPackages.buildPerlPackage rec {
     patchShebangs script/convos
   '';
 
-  # A test fails since gethostbyaddr(127.0.0.1) fails to resolve to localhost in
-  # the sandbox, we replace the this out from a substitution expression
-  #
-  # Module::Install is a runtime dependency not covered by the tests, so we add
-  # a test for it.
-  #
   preCheck = ''
+    # A test fails since gethostbyaddr(127.0.0.1) fails to resolve to localhost in
+    # the sandbox, we replace the this out from a substitution expression
+    #
     substituteInPlace t/web-register-open-to-public.t \
       --replace '!127.0.0.1!' '!localhost!'
 
+    # Module::Install is a runtime dependency not covered by the tests, so we add
+    # a test for it.
+    #
     echo "use Test::More tests => 1;require_ok('Module::Install')" \
       > t/00_nixpkgs_module_install.t
   '';

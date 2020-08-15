@@ -569,6 +569,8 @@ let
 
     mtime =  callPackage ../development/ocaml-modules/mtime { };
 
+    mustache =  callPackage ../development/ocaml-modules/mustache { };
+
     nocrypto =  callPackage ../development/ocaml-modules/nocrypto { };
 
     notty = callPackage ../development/ocaml-modules/notty { };
@@ -758,6 +760,8 @@ let
 
     sqlexpr = callPackage ../development/ocaml-modules/sqlexpr { };
 
+    tsort = callPackage ../development/ocaml-modules/tsort { };
+
     tuntap = callPackage ../development/ocaml-modules/tuntap { };
 
     tyxml = callPackage ../development/ocaml-modules/tyxml { };
@@ -838,9 +842,13 @@ let
 
     ppx_tools_versioned = callPackage ../development/ocaml-modules/ppx_tools_versioned { };
 
+    ppx_yojson_conv_lib = callPackage ../development/ocaml-modules/ppx_yojson_conv_lib {};
+
     printbox = callPackage ../development/ocaml-modules/printbox { };
 
     process = callPackage ../development/ocaml-modules/process { };
+
+    prof_spacetime = callPackage ../development/ocaml-modules/prof_spacetime { };
 
     ptmap = callPackage ../development/ocaml-modules/ptmap { };
 

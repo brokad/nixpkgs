@@ -25,6 +25,8 @@ let
 
   clientRestrictions = concatStringsSep ", " (clientAccess ++ dnsBl);
 
+  smtpTlsSecurityLevel = if cfg.useDane then "dane" else "may";
+
   mainCf = let
     escape = replaceStrings ["$"] ["$$"];
     mkList = items: "\n  " + concatStringsSep ",\n  " items;
@@ -488,7 +490,7 @@ in
         '';
         example = {
           mail_owner = "postfix";
-          smtp_use_tls = true;
+          smtp_tls_security_level = "may";
         };
       };
 
@@ -500,16 +502,26 @@ in
         ";
       };
 
+      tlsTrustedAuthorities = mkOption {
+        type = types.str;
+        default = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        description = ''
+          File containing trusted certification authorities (CA) to verify certificates of mailservers contacted for mail delivery. This basically sets smtp_tls_CAfile and enables opportunistic tls. Defaults to NixOS trusted certification authorities.
+        '';
+      };
+
+      useDane = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Sets smtp_tls_security_level to "dane" rather than "may". See postconf(5) for details.
+        '';
+      };
+
       sslCert = mkOption {
         type = types.str;
         default = "";
         description = "SSL certificate to use.";
-      };
-
-      sslCACert = mkOption {
-        type = types.str;
-        default = "";
-        description = "SSL certificate of CA.";
       };
 
       sslKey = mkOption {
@@ -805,18 +817,20 @@ in
         recipient_canonical_classes = [ "envelope_recipient" ];
       }
       // optionalAttrs cfg.enableHeaderChecks { header_checks = [ "regexp:/etc/postfix/header_checks" ]; }
+      // optionalAttrs (cfg.tlsTrustedAuthorities != "") {
+        smtp_tls_CAfile = cfg.tlsTrustedAuthorities;
+        smtp_tls_security_level = smtpTlsSecurityLevel;
+      }
       // optionalAttrs (cfg.sslCert != "") {
-        smtp_tls_CAfile = cfg.sslCACert;
         smtp_tls_cert_file = cfg.sslCert;
         smtp_tls_key_file = cfg.sslKey;
 
-        smtp_use_tls = true;
+        smtp_tls_security_level = smtpTlsSecurityLevel;
 
-        smtpd_tls_CAfile = cfg.sslCACert;
         smtpd_tls_cert_file = cfg.sslCert;
         smtpd_tls_key_file = cfg.sslKey;
 
-        smtpd_use_tls = true;
+        smtpd_tls_security_level = "may";
       };
 
       services.postfix.masterConfig = {
@@ -951,4 +965,9 @@ in
       services.postfix.mapFiles.client_access = checkClientAccessFile;
     })
   ]);
+
+  imports = [
+   (mkRemovedOptionModule [ "services" "postfix" "sslCACert" ]
+     "services.postfix.sslCACert was replaced by services.postfix.tlsTrustedAuthorities. In case you intend that your server should validate requested client certificates use services.postfix.extraConfig.")
+  ];
 }

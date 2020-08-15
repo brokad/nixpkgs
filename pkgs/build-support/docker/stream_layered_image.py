@@ -41,7 +41,7 @@ import pathlib
 import tarfile
 import itertools
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import namedtuple
 
 
@@ -74,6 +74,10 @@ def archive_paths_to(obj, paths, mtime, add_nix, filter=None):
         ti.gname = "root"
         return filter(ti)
 
+    def nix_root(ti):
+        ti.mode = 0o0555  # r-xr-xr-x
+        return ti
+
     def dir(path):
         ti = tarfile.TarInfo(path)
         ti.type = tarfile.DIRTYPE
@@ -84,8 +88,8 @@ def archive_paths_to(obj, paths, mtime, add_nix, filter=None):
         # these directories first when building layer tarballs. But
         # we don't need them on the customisation layer.
         if add_nix:
-            tar.addfile(apply_filters(dir("/nix")))
-            tar.addfile(apply_filters(dir("/nix/store")))
+            tar.addfile(apply_filters(nix_root(dir("/nix"))))
+            tar.addfile(apply_filters(nix_root(dir("/nix/store"))))
 
         for path in paths:
             path = pathlib.Path(path)
@@ -242,7 +246,7 @@ def main():
         conf = json.load(f)
 
     created = (
-      datetime.now(tz=datetime.timezone.utc)
+      datetime.now(tz=timezone.utc)
       if conf["created"] == "now"
       else datetime.fromisoformat(conf["created"])
     )
@@ -280,7 +284,7 @@ def main():
             },
             "history": [
                 {
-                  "created": conf["created"],
+                  "created": datetime.isoformat(created),
                   "comment": f"store paths: {layer.paths}"
                 }
                 for layer in layers
