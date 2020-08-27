@@ -54,7 +54,7 @@ let
     '') gitlabConfig.production.repositories.storages))}
   '';
 
-  gitlabShellConfig = {
+  gitlabShellConfig = flip recursiveUpdate cfg.extraShellConfig {
     user = cfg.user;
     gitlab_url = "http+unix://${pathUrlQuote gitlabSocket}";
     http_settings.self_signed_cert = false;
@@ -517,6 +517,12 @@ in {
         '';
       };
 
+      extraShellConfig = mkOption {
+        type = types.attrs;
+        default = {};
+        description = "Extra configuration to merge into shell-config.yml";
+      };
+
       extraConfig = mkOption {
         type = types.attrs;
         default = {};
@@ -696,7 +702,6 @@ in {
       "L+ /run/gitlab/shell-config.yml - - - - ${pkgs.writeText "config.yml" (builtins.toJSON gitlabShellConfig)}"
 
       "L+ ${cfg.statePath}/config/unicorn.rb - - - - ${./defaultUnicornConfig.rb}"
-      "L+ ${cfg.statePath}/config/initializers/extra-gitlab.rb - - - - ${extraGitlabRb}"
     ];
 
     systemd.services.gitlab-sidekiq = {
@@ -816,6 +821,7 @@ in {
             rm -f ${cfg.statePath}/lib
             cp -rf --no-preserve=mode ${cfg.packages.gitlab}/share/gitlab/config.dist/* ${cfg.statePath}/config
             cp -rf --no-preserve=mode ${cfg.packages.gitlab}/share/gitlab/db/* ${cfg.statePath}/db
+            ln -sf ${extraGitlabRb} ${cfg.statePath}/config/initializers/extra-gitlab.rb
 
             ${cfg.packages.gitlab-shell}/bin/install
 

@@ -13,13 +13,13 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "osu-lazer";
-  version = "2020.806.0";
+  version = "2020.820.0";
 
   src = fetchFromGitHub {
     owner = "ppy";
     repo = "osu";
     rev = version;
-    sha256 = "BelmqcDnrGH84fTs6M0krwWz6SHn2hOm7y+PNEOOOZM=";
+    sha256 = "0vszw0f5x0syshn8bnsbskxvknwpgbnm31kxwh1mfdr7pnxvw922";
   };
 
   patches = [ ./bypass-tamper-detection.patch ];
@@ -99,7 +99,11 @@ in stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Rhythm is just a *click* away";
     homepage = "https://osu.ppy.sh";
-    license = with licenses; [ mit cc-by-nc-40 ];
+    license = with licenses; [
+      mit
+      cc-by-nc-40
+      unfreeRedistributable # osu-framework contains libbass.so in repository
+    ];
     maintainers = with maintainers; [ oxalica ];
     platforms = [ "x86_64-linux" ];
   };

@@ -184,6 +184,8 @@ in {
 
   aioamqp = callPackage ../development/python-modules/aioamqp { };
 
+  aiojobs = callPackage ../development/python-modules/aiojobs { };
+
   aioredis = callPackage ../development/python-modules/aioredis { };
 
   aiorun = callPackage ../development/python-modules/aiorun { };
@@ -763,6 +765,8 @@ in {
   filterpy = callPackage ../development/python-modules/filterpy { };
 
   filemagic = callPackage ../development/python-modules/filemagic { };
+
+  finalfusion = callPackage ../development/python-modules/finalfusion { };
 
   fints = callPackage ../development/python-modules/fints { };
 
@@ -1556,6 +1560,8 @@ in {
 
   sabyenc = callPackage ../development/python-modules/sabyenc { };
 
+  sabyenc3 = callPackage ../development/python-modules/sabyenc3 { };
+
   salmon-mail = callPackage ../development/python-modules/salmon-mail { };
 
   sanic-auth = callPackage ../development/python-modules/sanic-auth { };
@@ -2050,10 +2056,12 @@ in {
 
   binwalk = callPackage ../development/python-modules/binwalk {
     pyqtgraph = null;
+    matplotlib = null;
   };
 
   binwalk-full = appendToName "full" (self.binwalk.override {
     pyqtgraph = self.pyqtgraph;
+    matplotlib = self.matplotlib;
   });
 
   bitmath = callPackage ../development/python-modules/bitmath { };
@@ -2566,6 +2574,8 @@ in {
 
   mxnet = callPackage ../development/python-modules/mxnet { };
 
+  nplusone = callPackage ../development/python-modules/nplusone { };
+
   parsy = callPackage ../development/python-modules/parsy { };
 
   portalocker = callPackage ../development/python-modules/portalocker { };
@@ -2725,6 +2735,8 @@ in {
   pytestpep8 = callPackage ../development/python-modules/pytest-pep8 { };
 
   pytest-pep257 = callPackage ../development/python-modules/pytest-pep257 { };
+
+  pytest-pythonpath = callPackage ../development/python-modules/pytest-pythonpath { };
 
   pytest-raisesregexp = callPackage ../development/python-modules/pytest-raisesregexp { };
 
@@ -3361,6 +3373,10 @@ in {
 
   measurement = callPackage ../development/python-modules/measurement {};
 
+  mercurial = disabledIf (!isPy3k) (toPythonModule (pkgs.mercurial.override {
+    python3Packages = self;
+  }));
+
   midiutil = callPackage ../development/python-modules/midiutil {};
 
   mido = callPackage ../development/python-modules/mido { };
@@ -3810,6 +3826,8 @@ in {
 
   django-webpack-loader = callPackage ../development/python-modules/django-webpack-loader { };
 
+  django-widget-tweaks = callPackage ../development/python-modules/django-widget-tweaks { };
+
   django_tagging = callPackage ../development/python-modules/django_tagging { };
 
   django_classytags = callPackage ../development/python-modules/django_classytags { };
@@ -4012,6 +4030,8 @@ in {
 
   flask-restplus = callPackage ../development/python-modules/flask-restplus { };
 
+  flask-restx = callPackage ../development/python-modules/flask-restx { };
+
   flask-reverse-proxy-fix = callPackage ../development/python-modules/flask-reverse-proxy-fix { };
 
   flask_script = callPackage ../development/python-modules/flask-script { };
@@ -4066,6 +4086,8 @@ in {
   pytorchWithoutCuda = self.pytorch.override {
     cudaSupport = false;
   };
+
+  pytorch-lightning = callPackage ../development/python-modules/pytorch-lightning { };
 
   pytorch-metric-learning = callPackage ../development/python-modules/pytorch-metric-learning { };
 
@@ -4424,8 +4446,6 @@ in {
 
   ipython = if isPy27 then
       callPackage ../development/python-modules/ipython/5.nix { }
-    else if isPy35 then
-      callPackage ../development/python-modules/ipython/7.9.nix { }
     else
       callPackage ../development/python-modules/ipython { };
 
@@ -4738,8 +4758,6 @@ in {
 
   markdown-macros = callPackage ../development/python-modules/markdown-macros { };
 
-  mathics = callPackage ../development/python-modules/mathics { };
-
   matplotlib = let
     path = if isPy3k then ../development/python-modules/matplotlib/default.nix else
       ../development/python-modules/matplotlib/2.nix;
@@ -4840,6 +4858,8 @@ in {
   else
     callPackage ../development/python-modules/mock { };
 
+  mocket = callPackage ../development/python-modules/mocket { };
+
   mock-open = callPackage ../development/python-modules/mock-open { };
 
   mockito = callPackage ../development/python-modules/mockito { };
@@ -4882,6 +4902,8 @@ in {
   multipledispatch = callPackage ../development/python-modules/multipledispatch { };
 
   multiprocess = callPackage ../development/python-modules/multiprocess { };
+
+  multitasking = callPackage ../development/python-modules/multitasking { };
 
   munkres = callPackage ../development/python-modules/munkres { };
 
@@ -5323,6 +5345,8 @@ in {
   piexif = callPackage ../development/python-modules/piexif { };
 
   pip = callPackage ../development/python-modules/pip { };
+
+  pipx = callPackage ../development/python-modules/pipx { };
 
   pip-tools = callPackage ../development/python-modules/pip-tools {
     git = pkgs.gitMinimal;
@@ -5916,7 +5940,8 @@ in {
 
   readchar = callPackage ../development/python-modules/readchar { };
 
-  retworkx = callPackage ../development/python-modules/retworkx { };
+  retworkx = disabledIf (pythonOlder "3.5")
+    (toPythonModule (callPackage ../development/python-modules/retworkx { } ));
 
   rivet = disabledIf (!isPy3k) (toPythonModule (pkgs.rivet.override {
     python3 = python;
@@ -5941,6 +5966,8 @@ in {
   django-multiselectfield = callPackage ../development/python-modules/django-multiselectfield { };
 
   rdflib = callPackage ../development/python-modules/rdflib { };
+
+  rdflib-jsonld = callPackage ../development/python-modules/rdflib-jsonld { };
 
   isodate = callPackage ../development/python-modules/isodate { };
 
@@ -6548,6 +6575,8 @@ in {
 
   stevedore = callPackage ../development/python-modules/stevedore {};
 
+  svglib = callPackage ../development/python-modules/svglib { };
+
   text-unidecode = callPackage ../development/python-modules/text-unidecode { };
 
   Theano = callPackage ../development/python-modules/Theano rec {
@@ -6712,6 +6741,8 @@ in {
   telethon-session-sqlalchemy = callPackage ../development/python-modules/telethon-session-sqlalchemy { };
 
   terminaltables = callPackage ../development/python-modules/terminaltables { };
+
+  test-tube = callPackage ../development/python-modules/test-tube { };
 
   testpath = callPackage ../development/python-modules/testpath { };
 
@@ -7150,6 +7181,8 @@ in {
   pluggy = callPackage ../development/python-modules/pluggy {};
 
   xcffib = callPackage ../development/python-modules/xcffib {};
+
+  xpybutil = callPackage ../development/python-modules/xpybutil {};
 
   pafy = callPackage ../development/python-modules/pafy { };
 
@@ -7617,6 +7650,8 @@ in {
 
   pure-pcapy3 = callPackage ../development/python-modules/pure-pcapy3 { };
 
+  cucumber-tag-expressions = callPackage ../development/python-modules/cucumber-tag-expressions { };
+
   behave = callPackage ../development/python-modules/behave { };
 
   bellows = callPackage ../development/python-modules/bellows { };
@@ -7700,6 +7735,8 @@ in {
   x256 = callPackage ../development/python-modules/x256 { };
 
   yattag = callPackage ../development/python-modules/yattag { };
+
+  yfinance = callPackage ../development/python-modules/yfinance { };
 
   xenomapper = disabledIf (!isPy3k) (callPackage ../applications/science/biology/xenomapper { });
 
@@ -7795,6 +7832,8 @@ in {
   pony = callPackage ../development/python-modules/pony { };
 
   rxv     = callPackage ../development/python-modules/rxv     { };
+
+  userpath = callPackage ../development/python-modules/userpath { };
 
 });
 
