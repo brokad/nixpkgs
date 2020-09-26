@@ -436,15 +436,16 @@ lib.mapAttrs (n: v: v // { shortName = n; }) {
   };
 
   # Proprietary binaries; free to redistribute without modification.
+  databricks = {
+    fullName = "Databricks Proprietary License";
+    url = "https://pypi.org/project/databricks-connect";
+    free = false;
+  };
+
   issl = {
     fullName = "Intel Simplified Software License";
     url = "https://software.intel.com/en-us/license/intel-simplified-software-license";
     free = false;
-  };
-
-  jasper = spdx {
-    spdxId = "JasPer-2.0";
-    fullName = "JasPer License";
   };
 
   lgpl2Only = spdx {
@@ -641,6 +642,12 @@ lib.mapAttrs (n: v: v // { shortName = n; }) {
   purdueBsd = {
     fullName = " Purdue BSD-Style License"; # also know as lsof license
     url = "https://enterprise.dejacode.com/licenses/public/purdue-bsd";
+  };
+
+  prosperity30 = {
+    fullName = "Prosperity-3.0.0";
+    free = false;
+    url = "https://prosperitylicense.com/versions/3.0.0.html";
   };
 
   qhull = spdx {

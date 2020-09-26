@@ -46,6 +46,7 @@ let
     "surfboard"
     "tor"
     "unifi"
+    "unifi-poller"
     "varnish"
     "wireguard"
   ] (name:
@@ -84,7 +85,8 @@ let
     };
     firewallFilter = mkOption {
       type = types.str;
-      default = "-p tcp -m tcp --dport ${toString port}";
+      default = "-p tcp -m tcp --dport ${toString cfg.${name}.port}";
+      defaultText = "-p tcp -m tcp --dport ${toString port}";
       example = literalExample ''
         "-i eth0 -p tcp -m tcp --dport ${toString port}"
       '';

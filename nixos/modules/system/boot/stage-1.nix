@@ -87,9 +87,7 @@ let
   # copy what we need.  Instead of using statically linked binaries,
   # we just copy what we need from Glibc and use patchelf to make it
   # work.
-  extraUtils = let
-    # Use lvm2 without udev support, which is the same lvm2 we already have in the closure anyways
-    lvm2 = pkgs.lvm2.override { udev = null; }; in pkgs.runCommandCC "extra-utils"
+  extraUtils = pkgs.runCommandCC "extra-utils"
     { nativeBuildInputs = [pkgs.buildPackages.nukeReferences];
       allowedReferences = [ "out" ]; # prevent accidents like glibc being included in the initrd
     }
@@ -113,20 +111,21 @@ let
       copy_bin_and_libs ${pkgs.utillinux}/sbin/blkid
 
       # Copy dmsetup and lvm.
-      copy_bin_and_libs ${getBin lvm2}/bin/dmsetup
-      copy_bin_and_libs ${getBin lvm2}/bin/lvm
+      copy_bin_and_libs ${getBin pkgs.lvm2}/bin/dmsetup
+      copy_bin_and_libs ${getBin pkgs.lvm2}/bin/lvm
 
       # Add RAID mdadm tool.
       copy_bin_and_libs ${pkgs.mdadm}/sbin/mdadm
       copy_bin_and_libs ${pkgs.mdadm}/sbin/mdmon
 
       # Copy udev.
-      copy_bin_and_libs ${udev}/lib/systemd/systemd-udevd
-      copy_bin_and_libs ${udev}/lib/systemd/systemd-sysctl
       copy_bin_and_libs ${udev}/bin/udevadm
+      copy_bin_and_libs ${udev}/lib/systemd/systemd-sysctl
       for BIN in ${udev}/lib/udev/*_id; do
         copy_bin_and_libs $BIN
       done
+      # systemd-udevd is only a symlink to udevadm these days
+      ln -sf udevadm $out/bin/systemd-udevd
 
       # Copy modprobe.
       copy_bin_and_libs ${pkgs.kmod}/bin/kmod
@@ -557,7 +556,7 @@ in
       };
 
     fileSystems = mkOption {
-      type = with lib.types; loaOf (submodule {
+      type = with lib.types; attrsOf (submodule {
         options.neededForBoot = mkOption {
           default = false;
           type = types.bool;

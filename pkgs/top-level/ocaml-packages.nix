@@ -137,11 +137,15 @@ let
 
     cohttp = callPackage ../development/ocaml-modules/cohttp { };
 
+    cohttp-async = callPackage ../development/ocaml-modules/cohttp/async.nix { };
+
     cohttp-lwt = callPackage ../development/ocaml-modules/cohttp/lwt.nix { };
 
     cohttp-lwt-unix = callPackage ../development/ocaml-modules/cohttp/lwt-unix.nix { };
 
     conduit = callPackage ../development/ocaml-modules/conduit { };
+
+    conduit-async = callPackage ../development/ocaml-modules/conduit/async.nix { };
 
     conduit-lwt = callPackage ../development/ocaml-modules/conduit/lwt.nix { };
 
@@ -168,6 +172,8 @@ let
     crunch = callPackage ../development/tools/ocaml/crunch { };
 
     cryptokit = callPackage ../development/ocaml-modules/cryptokit { };
+
+    csexp = callPackage ../development/ocaml-modules/csexp { };
 
     cstruct =
       if lib.versionAtLeast ocaml.version "4.2"
@@ -279,6 +285,8 @@ let
     faraday = callPackage ../development/ocaml-modules/faraday { };
 
     farfadet = callPackage ../development/ocaml-modules/farfadet { };
+
+    fdkaac = callPackage ../development/ocaml-modules/fdkaac { };
 
     fiat-p256 = callPackage ../development/ocaml-modules/fiat-p256 { };
 
@@ -750,6 +758,12 @@ let
 
     piqi-ocaml = callPackage ../development/ocaml-modules/piqi-ocaml { };
 
+    posix-base = callPackage ../development/ocaml-modules/posix/base.nix { };
+
+    posix-socket = callPackage ../development/ocaml-modules/posix/socket.nix { };
+
+    posix-types = callPackage ../development/ocaml-modules/posix/types.nix { };
+
     ppxfind = callPackage ../development/ocaml-modules/ppxfind { };
 
     ppxlib = callPackage ../development/ocaml-modules/ppxlib { };
@@ -868,7 +882,15 @@ let
 
     ptmap = callPackage ../development/ocaml-modules/ptmap { };
 
+    ptset = callPackage ../development/ocaml-modules/ptset { };
+
     pycaml = callPackage ../development/ocaml-modules/pycaml { };
+
+    qcheck-alcotest = callPackage ../development/ocaml-modules/qcheck/alcotest.nix { };
+
+    qcheck-core = callPackage ../development/ocaml-modules/qcheck/core.nix { };
+
+    qcheck-ounit = callPackage ../development/ocaml-modules/qcheck/ounit.nix { };
 
     qcheck = callPackage ../development/ocaml-modules/qcheck { };
 
@@ -901,6 +923,10 @@ let
     spelll = callPackage ../development/ocaml-modules/spelll { };
 
     sqlite3EZ = callPackage ../development/ocaml-modules/sqlite3EZ { };
+
+    srt = callPackage ../development/ocaml-modules/srt {
+      inherit (pkgs) srt;
+    };
 
     ssl = callPackage ../development/ocaml-modules/ssl { };
 
@@ -951,6 +977,8 @@ let
 
     wasm = callPackage ../development/ocaml-modules/wasm { };
 
+    webbrowser = callPackage ../development/ocaml-modules/webbrowser { };
+
     webmachine = callPackage ../development/ocaml-modules/webmachine { };
 
     wtf8 = callPackage ../development/ocaml-modules/wtf8 { };
@@ -991,7 +1019,7 @@ let
     janeStreet =
     if lib.versionOlder "4.08" ocaml.version
     then import ../development/ocaml-modules/janestreet/0.13.nix {
-      inherit ctypes janePackage num octavius ppxlib re;
+      inherit ctypes dune-configurator janePackage num octavius ppxlib re;
       inherit (pkgs) openssl;
     }
     else if lib.versionOlder "4.07" ocaml.version
@@ -1221,7 +1249,7 @@ in let inherit (pkgs) callPackage; in rec
 
   ocamlPackages_4_11 = mkOcamlPackages (callPackage ../development/compilers/ocaml/4.11.nix { });
 
-  ocamlPackages_latest = ocamlPackages_4_10;
+  ocamlPackages_latest = ocamlPackages_4_11;
 
   ocamlPackages = ocamlPackages_4_10;
 }

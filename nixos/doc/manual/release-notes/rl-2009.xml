@@ -27,6 +27,18 @@
     <para>GNOME desktop environment was upgraded to 3.36, see its <link xlink:href="https://help.gnome.org/misc/release-notes/3.36/">release notes</link>.</para>
    </listitem>
    <listitem>
+     <para>
+     The Cinnamon desktop environment (v4.6) has been added. <varname>services.xserver.desktopManager.cinnamon.enable = true;</varname> to try it out!
+     Remember that, with any new feature it's possible you could run into issues, so please send all support requests to <link xlink:href="https://github.com/NixOS/nixpkgs/issues">github.com/NixOS/nixpkgs</link> to notify the maintainers.
+     </para>
+   </listitem>
+   <listitem>
+    <para>
+      Quickly configure a complete, private, self-hosted video
+      conferencing solution with the new Jitsi Meet module.
+    </para>
+   </listitem>
+   <listitem>
     <para>
     <package>maxx</package> package removed along with <varname>services.xserver.desktopManager.maxx</varname> module.
     Please migrate to <package>cdesktopenv</package> and <varname>services.xserver.desktopManager.cde</varname> module.
@@ -204,6 +216,16 @@ GRANT ALL PRIVILEGES ON *.* TO 'mysql'@'localhost' WITH GRANT OPTION;
        Note: Password support is only avaiable in GRUB version 2.
      </para>
    </listitem>
+   <listitem>
+     <para>
+       Following its deprecation in 20.03, the Perl NixOS test driver has been removed.
+       All remaining tests have been ported to the Python test framework.
+       Code outside nixpkgs using <filename>make-test.nix</filename> or
+       <filename>testing.nix</filename> needs to be ported to
+       <filename>make-test-python.nix</filename> and
+       <filename>testing-python.nix</filename> respectively.
+     </para>
+   </listitem>
   </itemizedlist>
  </section>
 
@@ -222,6 +244,11 @@ GRANT ALL PRIVILEGES ON *.* TO 'mysql'@'localhost' WITH GRANT OPTION;
    <listitem>
     <para>
       There is a new <xref linkend="opt-security.doas.enable"/> module that provides <command>doas</command>, a lighter alternative to <command>sudo</command> with many of the same features.
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+      <link xlink:href="https://hercules-ci.com">Hercules CI</link> Agent is a specialized build agent for projects built with Nix. See the <link xlink:href="https://nixos.org/nixos/options.html#services.hercules-ci-agent">options</link> and <link xlink:href="https://docs.hercules-ci.com/hercules-ci/getting-started/#deploy-agent">setup</link>.
     </para>
    </listitem>
   </itemizedlist>
@@ -380,6 +407,20 @@ php.override {
      </para>
    </listitem>
    <listitem>
+    <para>
+     The ACME module has been overhauled for simplicity and maintainability.
+     Cert generation now implicitly uses the <literal>acme</literal>
+     user, and the <literal>security.acme.certs._name_.user</literal> option
+     has been removed. Instead, certificate access from other services is now
+     managed through group permissions. The module no longer runs lego
+     twice under certain conditions, and will correctly renew certificates if
+     their configuration is changed. Services which reload nginx and httpd after
+     certificate renewal are now properly configured too so you no longer have
+     to do this manually if you are using HTTPS enabled virtual hosts. A mechanism
+     for regenerating certs on demand has also been added and documented.
+    </para>
+   </listitem>
+   <listitem>
      <para>
       Gollum received a major update to version 5.x and you may have to change
       some links in your wiki when migrating from gollum 4.x. More information
@@ -398,8 +439,8 @@ php.override {
    </listitem>
    <listitem>
      <para>
-       Add option <literal>services.nginx.enableSandbox</literal> to starting Nginx web server with additional sandbox/hardening options.
-       By default, write access to <literal>services.nginx.stateDir</literal> is allowed. To allow writing to other folders,
+       Nginx web server now starting with additional sandbox/hardening options. By default, write access
+       to <literal>services.nginx.stateDir</literal> is allowed. To allow writing to other folders,
        use <literal>systemd.services.nginx.serviceConfig.ReadWritePaths</literal>
        <programlisting>
 systemd.services.nginx.serviceConfig.ReadWritePaths = [ "/var/www" ];
@@ -752,6 +793,47 @@ CREATE ROLE postgres LOGIN SUPERUSER;
      See <link xlink:href="https://github.com/NixOS/nixpkgs/pull/82743#issuecomment-674520472">the PR that changed this</link> for more info.
     </para>
    </listitem>
+   <listitem>
+    <para>
+     For NixOS configuration options, the type <literal>loaOf</literal>, after
+     its initial deprecation in release 20.03, has been removed. In NixOS and
+     Nixpkgs options using this type have been converted to <literal>attrsOf</literal>.
+     For more information on this change have look at these links:
+     <link xlink:href="https://github.com/NixOS/nixpkgs/issues/1800">issue #1800</link>,
+     <link xlink:href="https://github.com/NixOS/nixpkgs/pull/63103">PR #63103</link>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      <literal>config.systemd.services.${name}.path</literal> now returns a list of paths instead of a colon-separated string.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Caddy module now uses Caddy v2 by default. Caddy v1 can still be used by setting
+     <xref linkend="opt-services.caddy.package"/> to <literal>pkgs.caddy1</literal>.
+    </para>
+    <para>
+     New option <xref linkend="opt-services.caddy.adapter"/> has been added.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The <link linkend="opt-services.jellyfin.enable">jellyfin</link> module will use and stay on the Jellyfin version <literal>10.5.5</literal>
+     if <literal>stateVersion</literal> is lower than <literal>20.09</literal>. This is because significant changes were made to the database schema,
+     and it is highly recommended to backup your instance before upgrading. After making your backup, you can upgrade to the latest version either by
+     setting your <literal>stateVersion</literal> to <literal>20.09</literal> or higher, or set the <option>services.jellyfin.package</option> to
+     <literal>pkgs.jellyfin</literal>. If you do not wish to upgrade Jellyfin, but want to change your <literal>stateVersion</literal>, you can set
+     the value of <option>services.jellyfin.package</option> to <literal>pkgs.jellyfin_10_5</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The <literal>security.rngd</literal> service is now disabled by default.
+     This choice was made because there's krngd in the linux kernel space making it (for most usecases)
+     functionally redundent.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
@@ -780,6 +862,17 @@ CREATE ROLE postgres LOGIN SUPERUSER;
      of the default <literal>out</literal> output anymore - if you relied on the
      <literal>notmuch-emacs-mua</literal> binary or the emacs lisp files, access them via
      the <literal>notmuch.emacs</literal> output.
+
+     Device tree overlay support was improved in
+     <link xlink:href="https://github.com/NixOS/nixpkgs/pull/79370">#79370</link>
+     and now uses <xref linkend="opt-hardware.deviceTree.kernelPackage"/>
+     instead of <option>hardware.deviceTree.base</option>.
+
+     <xref linkend="opt-hardware.deviceTree.overlays"/> configuration was
+     extended to support <literal>.dts</literal> files with symbols.
+
+     Device trees can now be filtered by setting
+     <xref linkend="opt-hardware.deviceTree.filter"/> option.
     </para>
    </listitem>
    <listitem>
@@ -819,6 +912,12 @@ CREATE ROLE postgres LOGIN SUPERUSER;
    <para>
      Default algorithm for ZRAM swap was changed to <literal>zstd</literal>.
    </para>
+   </listitem>
+   <listitem>
+    <para>
+    The installer now enables sshd by default. This improves installation on headless machines especially ARM single-board-computer.
+    To login through ssh, either a password or an ssh key must be set for the root user or the nixos user.
+    </para>
    </listitem>
    <listitem>
     <para>
@@ -972,7 +1071,11 @@ services.transmission.settings.rpc-bind-address = "0.0.0.0";
     <para>
      Nginx module <literal>nginxModules.fastcgi-cache-purge</literal> renamed to official name <literal>nginxModules.cache-purge</literal>.
      Nginx module <literal>nginxModules.ngx_aws_auth</literal> renamed to official name <literal>nginxModules.aws-auth</literal>.
-      The packages <package>perl</package>, <package>rsync</package> and <package>strace</package> were removed from <option>systemPackages</option>. If you need them, install them again with <code><xref linkend="opt-environment.systemPackages"/> = with pkgs; [ perl rsync strace ];</code> in your <filename>configuration.nix</filename>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      The option <option>defaultPackages</option> was added. It installs the packages <package>perl</package>, <package>rsync</package> and <package>strace</package> for now. They were added unconditionally to <option>systemPackages</option> before, but are not strictly necessary for a minimal NixOS install. You can set it to an empty list to have a more minimal system. Be aware that some functionality might still have an impure dependency on those packages, so things might break.
     </para>
    </listitem>
    <listitem>
@@ -980,6 +1083,74 @@ services.transmission.settings.rpc-bind-address = "0.0.0.0";
       The <literal>undervolt</literal> option no longer needs to apply its
       settings every 30s. If they still become undone, open an issue and restore
       the previous behaviour using <literal>undervolt.useTimer</literal>.
+    </para>
+   </listitem>
+   <listitem>
+     <para>
+      Agda has been heavily reworked.
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    <literal>agda.mkDerivation</literal> has been heavily changed and
+	    is now located at <package>agdaPackages.mkDerivation</package>.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    New top-level packages <package>agda</package> and
+	    <literal>agda.withPackages</literal> have been added, the second
+	    of which sets up agda with access to chosen libraries.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    All agda libraries now live under
+	    <literal>agdaPackages</literal>.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Many broken libraries have been removed.
+	  </para>
+	</listitem>
+      </itemizedlist>
+      See the <link
+      xlink:href="https://nixos.org/nixpkgs/manual/#agda">new
+      documentation</link> for more information.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      The <literal>deepin</literal> package set has been removed from
+      nixpkgs. It was a work in progress to package the
+      <link xlink:href="https://www.deepin.org/en/dde/">Deepin Desktop Environment (DDE)</link>,
+      including libraries, tools and applications, and it was still
+      missing a service to lauch the desktop environment. It has shown
+      to no longer be a feasible goal due to reasons discussed in
+      <link xlink:href="https://github.com/NixOS/nixpkgs/issues/94870">issue #94870</link>.
+      The package <literal>netease-cloud-music</literal> has also been
+      removed, as it depends on libraries from deepin.
+    </para>
+   </listitem>
+   <listitem>
+     <para>
+       The <literal>opendkim</literal> module now uses systemd sandboxing features
+       to limit the exposure of the system towards the opendkim service.
+     </para>
+   </listitem>
+  </itemizedlist>
+  <itemizedlist>
+   <listitem>
+    <para />
+    <para>
+        Kubernetes has been upgraded to 1.19.1, which also means that the
+        golang version to build it has been bumped to 1.15. This may have
+        consequences for your existing clusters and their certificates. Please
+        consider
+        <link xlink:href="https://relnotes.k8s.io/?markdown=93264">
+            the release notes for Kubernetes 1.19 carefully
+        </link>
+        before upgrading.
     </para>
    </listitem>
   </itemizedlist>

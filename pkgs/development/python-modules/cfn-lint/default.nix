@@ -18,12 +18,16 @@
 
 buildPythonPackage rec {
   pname = "cfn-lint";
-  version = "0.33.0";
+  version = "0.35.0";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "b74bb89a3d0da4a744179b07bc186b9fbc4800f929bf635bb6246e80fb91a953";
+    sha256 = "42023d89520e3a29891ec2eb4c326eef9d1f7516fe9abee8b6c97ce064187b45";
   };
+
+  postPatch = ''
+    substituteInPlace setup.py --replace 'importlib_resources~=1.4;python_version<"3.7" and python_version!="3.4"' 'importlib_resources;python_version<"3.7"'
+  '';
 
   propagatedBuildInputs = [
     pyyaml
@@ -40,6 +44,21 @@ buildPythonPackage rec {
 
   # No tests included in archive
   doCheck = false;
+  pythonImportsCheck = [
+    "cfnlint"
+    "cfnlint.conditions"
+    "cfnlint.core"
+    "cfnlint.decode.node"
+    "cfnlint.decode.cfn_yaml"
+    "cfnlint.decode.cfn_json"
+    "cfnlint.decorators.refactored"
+    "cfnlint.graph"
+    "cfnlint.helpers"
+    "cfnlint.rules"
+    "cfnlint.runner"
+    "cfnlint.template"
+    "cfnlint.transform"
+  ];
 
   meta = with lib; {
     description = "Checks cloudformation for practices and behaviour that could potentially be improved";

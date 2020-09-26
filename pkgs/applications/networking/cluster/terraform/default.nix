@@ -132,8 +132,8 @@ in rec {
   });
 
   terraform_0_13 = pluggable (generic {
-    version = "0.13.0";
-    sha256 = "0kangddd99ix50w67hi0pwa9js9c0hjxqvrc0lxaa6msjvjsxyyq";
+    version = "0.13.3";
+    sha256 = "1bjgsabkyh3xf4gdp41mwhw6bpmjg45bnq2hk522glk02n2xngpw";
     patches = [ ./provider-path.patch ];
     passthru = { inherit plugins; };
   });

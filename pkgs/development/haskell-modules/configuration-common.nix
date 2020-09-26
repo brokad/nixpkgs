@@ -69,7 +69,7 @@ self: super: {
       name = "git-annex-${super.git-annex.version}-src";
       url = "git://git-annex.branchable.com/";
       rev = "refs/tags/" + super.git-annex.version;
-      sha256 = "1d24080xh7gl197i0y5bkn3j94hvh8zqyg9gfcnx2qdlxfca1knb";
+      sha256 = "19ipaalp9g25zhg44rialwhp2fv5n8q5fzqw72rfcjcca5iy6r72";
     };
   }).override {
     dbus = if pkgs.stdenv.isLinux then self.dbus else null;
@@ -212,7 +212,7 @@ self: super: {
     # https://github.com/haskell-nix/hnix/issues/676
     # Once neat-interpolation >= 0.4 is in our stack release,
     # (which should happen soon), we can remove this override
-    neat-interpolation = self.neat-interpolation_0_5_1_1;
+    neat-interpolation = self.neat-interpolation_0_5_1_2;
   });
 
   # Fails for non-obvious reasons while attempting to use doctest.
@@ -375,6 +375,7 @@ self: super: {
   tickle = dontCheck super.tickle;
   tpdb = dontCheck super.tpdb;
   translatable-intset = dontCheck super.translatable-intset;
+  trifecta = if pkgs.stdenv.hostPlatform.isAarch64 then dontCheck super.trifecta else super.trifecta; # affected by this bug https://gitlab.haskell.org/ghc/ghc/-/issues/15275#note_295461
   ua-parser = dontCheck super.ua-parser;
   unagi-chan = dontCheck super.unagi-chan;
   wai-logger = dontCheck super.wai-logger;
@@ -920,7 +921,12 @@ self: super: {
   # Generate cli completions for dhall.
   dhall = generateOptparseApplicativeCompletion "dhall" super.dhall;
   dhall-json = generateOptparseApplicativeCompletions ["dhall-to-json" "dhall-to-yaml"] super.dhall-json;
-  dhall-nix = generateOptparseApplicativeCompletion "dhall-to-nix" (super.dhall-nix);
+  dhall-nix = generateOptparseApplicativeCompletion "dhall-to-nix" (
+    super.dhall-nix.overrideScope (self: super: {
+      dhall = super.dhall_1_35_0;
+      repline = self.repline_0_4_0_0;
+      haskeline = self.haskeline_0_8_1_0;
+    }));
 
   # https://github.com/haskell-hvr/netrc/pull/2#issuecomment-469526558
   netrc = doJailbreak super.netrc;
@@ -1010,11 +1016,6 @@ self: super: {
       sha256 = "07nj2p0kg05livhgp1hkkdph0j0a6lb216f8x348qjasy0lzbfhl";
     })];
   });
-
-  # 2020-06-05: HACK: In Nixpkgs currently this is
-  # old pandoc version 2.7.4 to current 2.9.2.1,
-  # test suite failures: https://github.com/jgm/pandoc/issues/5582
-  pandoc = dontCheck super.pandoc;
 
   # Fix build with attr-2.4.48 (see #53716)
   xattr = appendPatch super.xattr ./patches/xattr-fix-build.patch;
@@ -1155,13 +1156,6 @@ self: super: {
   # 2020-06-22: NOTE: QuickCheck upstreamed https://github.com/phadej/binary-instances/issues/7
   binary-instances = dontCheck super.binary-instances;
 
-  # Disabling the test suite lets the build succeed on older CPUs
-  # that are unable to run the generated library because they
-  # lack support for AES-NI, like some of our Hydra build slaves
-  # do. See https://github.com/NixOS/nixpkgs/issues/81915 for
-  # details.
-  cryptonite = dontCheck super.cryptonite;
-
   # The test suite depends on an impure cabal-install installation in
   # $HOME, which we don't have in our build sandbox.
   cabal-install-parsers = dontCheck super.cabal-install-parsers;
@@ -1215,7 +1209,15 @@ self: super: {
 
   # this will probably need to get updated with every ghcide update,
   # we need an override because ghcide is tracking haskell-lsp closely.
-  ghcide = dontCheck (super.ghcide.override { ghc-check = self.ghc-check_0_3_0_1; });
+  ghcide = dontCheck (appendPatch (super.ghcide.override {
+    hie-bios = dontCheck super.hie-bios_0_7_1;
+    lsp-test = dontCheck self.lsp-test_0_11_0_5;
+  }) (pkgs.fetchpatch {
+    # This patch loosens the hie-bios upper bound.
+    # It is already merged into upstream and won‘t be needed for ghcide 0.4.0
+    url = "https://github.com/haskell/ghcide/commit/3e1b3620948870a4da8808ca0c0897fbd3ecad16.patch";
+    sha256 = "1jwn7jgi740x6wwv1k0mz9d4z0b9p3mzs54pdg4nfq0h2v7zxchz";
+  }));
 
   # hasn‘t bumped upper bounds
   # upstream: https://github.com/obsidiansystems/which/pull/6
@@ -1236,13 +1238,6 @@ self: super: {
   # tls test suite fails: upstream https://github.com/vincenthz/hs-tls/issues/434
   x509-validation = dontCheck super.x509-validation;
   tls = dontCheck super.tls;
-
-  # Upstream PR: https://github.com/bgamari/monoidal-containers/pull/62
-  # Bump these version bound
-  monoidal-containers = appendPatch super.monoidal-containers (pkgs.fetchpatch {
-    url = "https://github.com/bgamari/monoidal-containers/commit/715093b22a015398a1390f636be6f39a0de83254.patch";
-    sha256="1lfxvwp8g55ljxvj50acsb0wjhrvp2hvir8y0j5pfjkd1kq628ng";
-  });
 
   patch = appendPatches super.patch [
     # Upstream PR: https://github.com/reflex-frp/patch/pull/20
@@ -1333,13 +1328,19 @@ self: super: {
   # https://github.com/ennocramer/monad-dijkstra/issues/4
   monad-dijkstra = dontCheck (doJailbreak super.monad-dijkstra);
 
+  # Fixed upstream but not released to Hackage yet:
+  # https://github.com/k0001/hs-libsodium/issues/2
+  libsodium = overrideCabal super.libsodium (drv: {
+    libraryToolDepends = (drv.libraryToolDepends or []) ++ [self.c2hs];
+  });
+
   # https://github.com/kowainik/policeman/issues/57
   policeman = doJailbreak super.policeman;
 
   # 2020-08-14: gi-pango from stackage is to old for the C libs it links against in nixpkgs.
   # That's why we need to bump a ton of dependency versions to unbreak them.
   gi-pango = assert super.gi-pango.version == "1.0.22"; self.gi-pango_1_0_23;
-  haskell-gi-base = assert super.haskell-gi-base.version == "0.23.0"; addBuildDepends (self.haskell-gi-base_0_24_2) [ pkgs.gobject-introspection ];
+  haskell-gi-base = assert super.haskell-gi-base.version == "0.23.0"; addBuildDepends (self.haskell-gi-base_0_24_3) [ pkgs.gobject-introspection ];
   haskell-gi = assert super.haskell-gi.version == "0.23.1"; self.haskell-gi_0_24_4;
   gi-cairo = assert super.gi-cairo.version == "1.0.23"; self.gi-cairo_1_0_24;
   gi-glib = assert super.gi-glib.version == "2.0.23"; self.gi-glib_2_0_24;
@@ -1380,47 +1381,55 @@ self: super: {
   # https://github.com/jgm/commonmark-hs/issues/55
   commonmark-extensions = dontCheck super.commonmark-extensions;
 
-  # The overrides in the following lines all have the following causes:
-  # * neuron needs commonmark-pandoc
-  # * which needs a newer pandoc-types (>= 1.21)
-  # * which means we need a newer pandoc (>= 2.10)
-  # * which needs a newer hslua (1.1.2) and a newer jira-wiki-markup (1.3.2)
-  # Then we need to apply those overrides to all transitive dependencies
-  # All of this will be obsolete, when pandoc 2.10 hits stack lts.
-  commonmark-pandoc = super.commonmark-pandoc.override {
-    pandoc-types = self.pandoc-types_1_21;
-  };
-  reflex-dom-pandoc = super.reflex-dom-pandoc.override {
-    pandoc-types = self.pandoc-types_1_21;
-  };
-  pandoc_2_10_1 = super.pandoc_2_10_1.overrideScope (self: super: {
-    pandoc-types = self.pandoc-types_1_21;
-    hslua = self.hslua_1_1_2;
-    jira-wiki-markup = self.jira-wiki-markup_1_3_2;
-  });
-
   # Apply version-bump patch that is not contained in released version yet.
   # Upstream PR: https://github.com/srid/neuron/pull/304
-  neuron = (appendPatch super.neuron (pkgs.fetchpatch {
+  neuron = appendPatch super.neuron (pkgs.fetchpatch {
     url= "https://github.com/srid/neuron/commit/9ddcb7e9d63b8266d1372ef7c14c13b6b5277990.patch";
     sha256 = "01f9v3jnl05fnpd624wv3a0j5prcbnf62ysa16fbc0vabw19zv1b";
     excludes = [ "commonmark-hs/github.json" ];
     stripLen = 2;
     extraPrefix = "";
-  }))
-    # See comment about overrides above commonmark-pandoc
-    .overrideScope (self: super: {
-    pandoc = self.pandoc_2_10_1;
-    pandoc-types = self.pandoc-types_1_21;
   });
 
   # Testsuite trying to run `which haskeline-examples-Test`
-  haskeline_0_8_0_0 = dontCheck super.haskeline_0_8_0_0;
+  haskeline_0_8_1_0 = dontCheck super.haskeline_0_8_1_0;
+
+  # Tests for list-t, superbuffer, and stm-containers
+  # depend on HTF and it is broken, 2020-08-23
+  list-t = dontCheck super.list-t;
+  superbuffer = dontCheck super.superbuffer;
+  stm-containers = dontCheck super.stm-containers;
+
+  # Fails with "supports custom headers"
+  Spock-core = dontCheck super.Spock-core;
+
+  # Needed by Hasura  1.3.1
+  dependent-map_0_2_4_0 = super.dependent-map_0_2_4_0.override {
+    dependent-sum = self.dependent-sum_0_4;
+  };
+
+  # Hasura 1.3.1
+  # Because of ghc-heap-view, profiling needs to be disabled.
+  graphql-engine = disableLibraryProfiling( overrideCabal (super.graphql-engine.override {
+     immortal = self.immortal_0_2_2_1;
+     dependent-map = self.dependent-map_0_2_4_0;
+     dependent-sum = self.dependent-sum_0_4;
+     witherable = self.witherable_0_3_2;
+  }) (drv: {
+     # version in cabal file is invalid
+     version = "1.3.1-beta1";
+     # hasura needs VERSION env exported during build
+     preBuild = "export VERSION=1.3.1-beta1";
+  }));
+
+  graphql-parser = super.graphql-parser.override {
+     protolude = self.protolude_0_3_0;
+  };
 
   # Requires repline 0.4 which is the default only for ghc8101, override for the rest
   zre = super.zre.override {
     repline = self.repline_0_4_0_0.override {
-      haskeline = self.haskeline_0_8_0_0;
+      haskeline = self.haskeline_0_8_1_0;
     };
   };
 
@@ -1441,27 +1450,56 @@ self: super: {
 
   # Tests rely on `Int` being 64-bit: https://github.com/hspec/hspec/issues/431.
   # Also, we need QuickCheck-2.14.x to build the test suite, which isn't easy in LTS-16.x.
-  # So let's not go there any just disable the tests altogether.
+  # So let's not go there and just disable the tests altogether.
   hspec-core = dontCheck super.hspec-core;
 
+  # github.com/ucsd-progsys/liquidhaskell/issues/1729
+  liquidhaskell = super.liquidhaskell.override { Diff = self.Diff_0_3_4; };
+  Diff_0_3_4 = dontCheck super.Diff_0_3_4;
+
+  # We want the latest version of cryptonite. This is a first step towards
+  # resolving https://github.com/NixOS/nixpkgs/issues/81915.
+  cryptonite = doDistribute self.cryptonite_0_27;
+
+  # We want the latest version of Pandoc.
+  hslua = doDistribute self.hslua_1_1_2;
+  jira-wiki-markup = doDistribute self.jira-wiki-markup_1_3_2;
+  pandoc = doDistribute self.pandoc_2_10_1;
+  pandoc-citeproc = doDistribute self.pandoc-citeproc_0_17_0_2;
+  pandoc-plot = doDistribute self.pandoc-plot_0_9_2_0;
+  pandoc-types = doDistribute self.pandoc-types_1_21;
+  rfc5051 = doDistribute self.rfc5051_0_2;
+
+  # Upstream forgot to change the Cabal version bounds in the test suite.
+  # See: https://github.com/jaspervdj/stylish-haskell/pull/297
+  # Will be fixed whenever they next bump the version number
+  stylish-haskell = appendPatch super.stylish-haskell (pkgs.fetchpatch {
+    url = "https://github.com/jaspervdj/stylish-haskell/commit/9550aa1cd177aa6fe271d075177109d66a79e67f.patch";
+    sha256 = "1ffnbd2s4fx0ylnnlcyyag119yxb32p5r20b38l39lsa0jwv229f";
+  });
   # INSERT NEW OVERRIDES ABOVE THIS LINE
 
 } // (let
+  inherit (self) hls-ghcide hls-brittany;
   hlsScopeOverride = self: super: {
     # haskell-language-server uses its own fork of ghcide
     # Test disabled: it seems to freeze (is it just that it takes a long time ?)
-    ghcide = dontCheck self.hls-ghcide;
+    ghcide = dontCheck hls-ghcide;
     # we are faster than stack here
-    hie-bios = dontCheck self.hie-bios_0_6_2;
-    lsp-test = dontCheck self.lsp-test_0_11_0_4;
+    hie-bios = dontCheck super.hie-bios_0_7_1;
+    lsp-test = dontCheck super.lsp-test_0_11_0_5;
     # fourmolu can‘t compile with an older aeson
     aeson = dontCheck super.aeson_1_5_2_0;
     # brittany has an aeson upper bound of 1.5
-    brittany = doJailbreak super.brittany;
+    brittany = hls-brittany;
+    data-tree-print = doJailbreak super.data-tree-print;
+    ghc-exactprint = dontCheck super.ghc-exactprint_0_6_3_2;
   };
   in {
-    haskell-language-server = dontCheck (super.haskell-language-server.overrideScope hlsScopeOverride);
+    # jailbreaking for hie-bios 0.7.0 (upstream PR: https://github.com/haskell/haskell-language-server/pull/357)
+    haskell-language-server = dontCheck (doJailbreak (super.haskell-language-server.overrideScope hlsScopeOverride));
     hls-ghcide = dontCheck (super.hls-ghcide.overrideScope hlsScopeOverride);
-    fourmolu = super.fourmolu.overrideScope hlsScopeOverride;
+    hls-brittany = dontCheck (super.hls-brittany.overrideScope hlsScopeOverride);
+    fourmolu = dontCheck (super.fourmolu.overrideScope hlsScopeOverride);
   }
 )  // import ./configuration-tensorflow.nix {inherit pkgs haskellLib;} self super
