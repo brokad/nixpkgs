@@ -35,7 +35,7 @@ let
       # Steam VR
       procps
       usbutils
-    ] ++ lib.optional withJava jdk
+    ] ++ lib.optional withJava jdk8 # TODO: upgrade https://github.com/NixOS/nixpkgs/pull/89731
       ++ lib.optional withPrimus primus
       ++ extraPkgs pkgs;
 
@@ -223,7 +223,7 @@ in buildFHSUserEnv rec {
     mkdir -p $out/share/applications
     ln -s ${steam}/share/icons $out/share
     ln -s ${steam}/share/pixmaps $out/share
-    sed "s,/usr/bin/steam,$out/bin/steam,g" ${steam}/share/applications/steam.desktop > $out/share/applications/steam.desktop
+    sed "s,/usr/bin/steam,steam,g" ${steam}/share/applications/steam.desktop > $out/share/applications/steam.desktop
   '';
 
   profile = ''

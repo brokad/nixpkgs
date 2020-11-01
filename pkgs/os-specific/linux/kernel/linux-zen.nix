@@ -1,18 +1,19 @@
 { stdenv, fetchFromGitHub, buildLinux, ... } @ args:
 
 let
-  version = "5.8.7";
+  version = "5.8.13";
 in
 
 buildLinux (args // {
   modDirVersion = "${version}-zen1";
   inherit version;
+  isZen = true;
 
   src = fetchFromGitHub {
     owner = "zen-kernel";
     repo = "zen-kernel";
     rev = "v${version}-zen1";
-    sha256 = "06s7dpfxvwqfyh8qm8krcaxy98ki26cgh67k12g734bclg4bqsc5";
+    sha256 = "161bvrmic7gspkgkv0pqssk6dzv95vkxld69rir968khwlnpsnim";
   };
 
   extraMeta = {

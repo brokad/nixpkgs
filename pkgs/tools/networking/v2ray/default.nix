@@ -3,22 +3,22 @@
 }:
 
 let
-  version = "4.27.5";
+  version = "4.31.0";
 
   src = fetchFromGitHub {
     owner = "v2ray";
     repo = "v2ray-core";
     rev = "v${version}";
-    sha256 = "168kz8hq7mcfy6h758mmrky550p04bi9jsfqhy67jcxq81874m2k";
+    sha256 = "0s0blc05nrqm78qslv5xb42pjlx5v8qqwg0pwbzhxn9s71x2669m";
   };
 
-  vendorSha256 = "0m889byxw70vv1mzlivalq444byp0y182nqqzdr458gfifvpc7s7";
+  vendorSha256 = "0n2mf19fvgk5x0j2wwm4zk9xikzvl6cdvw26qar91wzcsraf5z2d";
 
   assets = {
     # MIT licensed
     "geoip.dat" = let
-      geoipRev = "202009020005";
-      geoipSha256 = "1xsy678cpqv6ycnhzl3pms76ic40aggq46q9dsd5ghj94mcx9837";
+      geoipRev = "202009300006";
+      geoipSha256 = "1ss2izqlmrp5b5kpw804jk6c1nyimwlccbkikix3bwfaz4vlv1nc";
     in fetchurl {
       url = "https://github.com/v2ray/geoip/releases/download/${geoipRev}/geoip.dat";
       sha256 = geoipSha256;
@@ -26,8 +26,8 @@ let
 
     # MIT licensed
     "geosite.dat" = let
-      geositeRev = "20200901194123";
-      geositeSha256 = "0fjx1wrq14d9v326k4fjwca3h5nv8ghk11kprf6jkjncjszwvgby";
+      geositeRev = "20201010021828";
+      geositeSha256 = "0gpfhcf4iyx7ip7rlkb0l1q64w84zvmcah52qyjwljs6l4p3hrj9";
     in fetchurl {
       url = "https://github.com/v2ray/domain-list-community/releases/download/${geositeRev}/dlc.dat";
       sha256 = geositeSha256;
@@ -64,7 +64,6 @@ let
 in runCommand "v2ray-${version}" {
   inherit version;
 
-  buildInputs = [ assetsDrv core ];
   nativeBuildInputs = [ makeWrapper ];
 
   meta = {

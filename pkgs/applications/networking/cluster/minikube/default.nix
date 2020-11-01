@@ -11,9 +11,9 @@
 
 buildGoModule rec {
   pname = "minikube";
-  version = "1.13.0";
+  version = "1.14.1";
 
-  vendorSha256 = "09bcp7pqbs9j06z1glpad70dqlsnrf69vn75l00bdjknbrvbzrb9";
+  vendorSha256 = "057mlmja3mygfdf0cp0bcm0chq7s30bjcs5hqacwl6c79ivrjf89";
 
   doCheck = false;
 
@@ -21,7 +21,7 @@ buildGoModule rec {
     owner = "kubernetes";
     repo = "minikube";
     rev = "v${version}";
-    sha256 = "1xlz07q0nlsq6js58b5ad0wxajwganaqcvwglj4w6fgmiqm9s1ny";
+    sha256 = "000i30qsjx1h2x6b8vb5piq9lhjrz5hj9wza7gxsrzsf2z9rhryg";
   };
 
   nativeBuildInputs = [ go-bindata installShellFiles pkg-config which ];
@@ -49,7 +49,7 @@ buildGoModule rec {
     homepage = "https://minikube.sigs.k8s.io";
     description = "A tool that makes it easy to run Kubernetes locally";
     license = licenses.asl20;
-    maintainers = with maintainers; [ ebzzry copumpkin vdemeester atkinschang ];
+    maintainers = with maintainers; [ ebzzry copumpkin vdemeester atkinschang Chili-Man ];
     platforms = platforms.unix;
   };
 }

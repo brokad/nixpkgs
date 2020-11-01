@@ -136,6 +136,7 @@ let
           fi
         done
 
+        echo '${cfg.filesSection}' >> $out
         echo 'EndSection' >> $out
 
         echo "$config" >> $out
@@ -151,6 +152,9 @@ in
       ./desktop-managers/default.nix
       (mkRemovedOptionModule [ "services" "xserver" "startGnuPGAgent" ]
         "See the 16.09 release notes for more information.")
+      (mkRemovedOptionModule
+        [ "services" "xserver" "startDbusSession" ]
+        "The user D-Bus session is now always socket activated and this option can safely be removed.")
       (mkRemovedOptionModule ["services" "xserver" "useXFS" ]
         "Use services.xserver.fontPath instead of useXFS")
     ];
@@ -298,14 +302,6 @@ in
         description = "DPI resolution to use for X server.";
       };
 
-      startDbusSession = mkOption {
-        type = types.bool;
-        default = true;
-        description = ''
-          Whether to start a new DBus session when you log in with dbus-launch.
-        '';
-      };
-
       updateDbusEnvironment = mkOption {
         type = types.bool;
         default = false;
@@ -364,6 +360,13 @@ in
           The contents of the configuration file of the X server
           (<filename>xorg.conf</filename>).
         '';
+      };
+
+      filesSection = mkOption {
+        type = types.lines;
+        default = "";
+        example = ''FontPath "/path/to/my/fonts"'';
+        description = "Contents of the first <literal>Files</literal> section of the X server configuration file.";
       };
 
       deviceSection = mkOption {
@@ -675,14 +678,14 @@ in
 
         script = "${cfg.displayManager.job.execCmd}";
 
+        # Stop restarting if the display manager stops (crashes) 2 times
+        # in one minute. Starting X typically takes 3-4s.
+        startLimitIntervalSec = 30;
+        startLimitBurst = 3;
         serviceConfig = {
           Restart = "always";
           RestartSec = "200ms";
           SyslogIdentifier = "display-manager";
-          # Stop restarting if the display manager stops (crashes) 2 times
-          # in one minute. Starting X typically takes 3-4s.
-          StartLimitInterval = "30s";
-          StartLimitBurst = "3";
         };
       };
 
@@ -708,7 +711,7 @@ in
 
     system.extraDependencies = singleton (pkgs.runCommand "xkb-validated" {
       inherit (cfg) xkbModel layout xkbVariant xkbOptions;
-      nativeBuildInputs = [ pkgs.xkbvalidate ];
+      nativeBuildInputs = with pkgs.buildPackages; [ xkbvalidate ];
       preferLocalBuild = true;
     } ''
       xkbvalidate "$xkbModel" "$layout" "$xkbVariant" "$xkbOptions"

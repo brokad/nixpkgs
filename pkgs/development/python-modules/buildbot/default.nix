@@ -25,11 +25,11 @@ let
 
   package = buildPythonPackage rec {
     pname = "buildbot";
-    version = "2.8.2";
+    version = "2.8.4";
 
     src = fetchPypi {
       inherit pname version;
-      sha256 = "0rdrz2zkd6xaf9kb5l41xmbfzq618sz498w23irshih4c802pdv5";
+      sha256 = "0i2sbxhsqyk2yr234il0zsyp1rf2v1l5hmzvw0yrgds6jpr19cqv";
     };
 
     propagatedBuildInputs = [
@@ -103,7 +103,7 @@ let
 
     meta = with lib; {
       homepage = "https://buildbot.net/";
-      description = "Buildbot is an open-source continuous integration framework for automating software build, test, and release processes";
+      description = "An open-source continuous integration framework for automating software build, test, and release processes";
       maintainers = with maintainers; [ nand0p ryansydnor lopsided98 ];
       license = licenses.gpl2;
     };

@@ -6,6 +6,7 @@
 , curl
 , dbus
 , dbus-glib
+, fetchpatch
 , fetchurl
 , file
 , fontconfig
@@ -69,13 +70,13 @@ assert waylandSupport -> gtk3Support == true;
 
 stdenv.mkDerivation rec {
   pname = "thunderbird";
-  version = "78.2.2";
+  version = "78.4.0";
 
   src = fetchurl {
     url =
       "mirror://mozilla/thunderbird/releases/${version}/source/thunderbird-${version}.source.tar.xz";
     sha512 =
-      "2cbpyx9jn23kc289z8ikzx3035g5z6p076izvld50mj3kqc0v4n3igih3rv1lsdwysik8c0ax5w3pa037lnrp6ridgbnix34gxr4nw6";
+      "04b6n3gsan0a5abh371ws3c3rry4dcb3c6rbqmcxkzrdjg2xr5vn6xhlg3dgl3l01p0hp1xqpckj8g5yb2dq2x07xgg1hnyhs9aadh5";
   };
 
   nativeBuildInputs = [
@@ -327,6 +328,7 @@ stdenv.mkDerivation rec {
       eelco
       lovesegfault
       pierron
+      vcunat
     ];
     platforms = platforms.linux;
     license = licenses.mpl20;

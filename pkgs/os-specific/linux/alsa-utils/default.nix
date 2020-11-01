@@ -2,15 +2,15 @@
 
 stdenv.mkDerivation rec {
   pname = "alsa-utils";
-  version = "1.2.3";
+  version = "1.2.4";
 
   src = fetchurl {
     url = "mirror://alsa/utils/${pname}-${version}.tar.bz2";
-    sha256 = "1ai1z4kf91b1m3qrpwqkc1af5vm2fkdkknqv95xdwf19q94aw6gz";
+    sha256 = "09m4dnn4kplawprd2bl15nwa0b4r1brab3x44ga7f1fyk7aw5zwq";
   };
 
-  nativeBuildInputs = [ gettext makeWrapper ];
-  buildInputs = [ alsaLib ncurses libsamplerate fftw ];
+  nativeBuildInputs = [ gettext ];
+  buildInputs = [ makeWrapper alsaLib ncurses libsamplerate fftw ];
 
   configureFlags = [ "--disable-xmlto" "--with-udev-rules-dir=$(out)/lib/udev/rules.d" ];
 

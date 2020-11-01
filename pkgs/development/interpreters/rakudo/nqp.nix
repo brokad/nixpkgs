@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   pname = "nqp";
-  version = "2020.08.2";
+  version = "2020.10";
 
   src = fetchurl {
     url    = "https://github.com/raku/nqp/releases/download/${version}/nqp-${version}.tar.gz";
-    sha256 = "14zr1swprxl284k0h1w72pcypj24sga15170ylaqjb8wxy8h1mqw";
+    sha256 = "0nb0vdycz2wrd5yspvps2wy7a21066csr18v786085qim347830h";
   };
 
   buildInputs = [ perl ];

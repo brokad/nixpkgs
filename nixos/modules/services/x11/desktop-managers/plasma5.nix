@@ -184,6 +184,14 @@ in
 
   config = mkMerge [
     (mkIf cfg.enable {
+      # Seed our configuration into nixos-generate-config
+      system.nixos-generate-config.desktopConfiguration = ''
+        # Enable the Plasma 5 Desktop Environment.
+        services.xserver.enable = true;
+        services.xserver.displayManager.sddm.enable = true;
+        services.xserver.desktopManager.plasma5.enable = true;
+      '';
+
       services.xserver.desktopManager.session = singleton {
         name = "plasma5";
         bgSupport = true;
@@ -274,6 +282,7 @@ in
           plasma-browser-integration
           plasma-integration
           polkit-kde-agent
+          spectacle
           systemsettings
 
           plasma-desktop
@@ -362,6 +371,8 @@ in
 
       # Update the start menu for each user that is currently logged in
       system.userActivationScripts.plasmaSetup = activationScript;
+
+      nixpkgs.config.firefox.enablePlasmaBrowserIntegration = true;
     })
   ];
 

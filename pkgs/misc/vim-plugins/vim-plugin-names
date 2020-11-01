@@ -1,4 +1,5 @@
 907th/vim-auto-save
+aca/completion-tabnine
 airblade/vim-gitgutter
 airblade/vim-rooter
 ajh17/Spacegray.vim
@@ -97,6 +98,7 @@ elmcast/elm-vim
 elzr/vim-json
 embear/vim-localvimrc
 enomsg/vim-haskellConcealPlus
+enricobacis/vim-airline-clock
 ensime/ensime-vim
 ervandew/supertab
 esneider/YUNOcommit.vim
@@ -150,6 +152,7 @@ hrsh7th/vim-vsnip
 hrsh7th/vim-vsnip-integ
 hsanson/vim-android
 hsitz/VimOrganizer
+hugolgst/vimsence
 iamcco/coc-spell-checker
 iamcco/coc-vimlsp
 ianks/vim-tsx
@@ -367,6 +370,8 @@ numirias/semshi
 nvie/vim-flake8
 nvim-lua/completion-nvim
 nvim-lua/diagnostic-nvim
+nvim-lua/lsp_extensions.nvim
+nvim-lua/telescope.nvim
 nvim-treesitter/completion-treesitter
 nvim-treesitter/nvim-treesitter
 ocaml/vim-ocaml
@@ -490,6 +495,7 @@ thinca/vim-themis
 thinca/vim-visualstar
 thirtythreeforty/lessspace.vim
 thosakwe/vim-flutter
+tiagofumo/vim-nerdtree-syntax-highlight
 tikhomirov/vim-glsl
 tmhedberg/SimpylFold
 tmsvg/pear-tree
@@ -543,6 +549,7 @@ uarun/vim-protobuf
 udalov/kotlin-vim
 ujihisa/neco-look
 unblevable/quick-scope
+urbit/hoon.vim
 Valodim/deoplete-notmuch
 vhda/verilog_systemverilog.vim
 vim-airline/vim-airline

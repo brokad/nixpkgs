@@ -34,6 +34,8 @@ let
 
   gh = callPackage ./gh { };
 
+  ghorg = callPackage ./ghorg { };
+
   ghq = callPackage ./ghq { };
 
   git = appendToName "minimal" gitBase;
@@ -112,7 +114,7 @@ let
 
   git-ignore = callPackage ./git-ignore { };
 
-  git-imerge = callPackage ./git-imerge { };
+  git-imerge = python3Packages.callPackage ./git-imerge { };
 
   git-interactive-rebase-tool = callPackage ./git-interactive-rebase-tool {
     inherit (darwin.apple_sdk.frameworks) Security;
@@ -131,6 +133,8 @@ let
   git-recent = callPackage ./git-recent {
     utillinux = if stdenv.isLinux then utillinuxMinimal else utillinux;
   };
+
+  git-remote-codecommit = python3Packages.callPackage ./git-remote-codecommit { };
 
   git-remote-gcrypt = callPackage ./git-remote-gcrypt { };
 
@@ -236,6 +240,8 @@ let
   top-git = callPackage ./topgit { };
 
   transcrypt = callPackage ./transcrypt { };
+
+  git-vanity-hash = callPackage ./git-vanity-hash { };
 
   ydiff = pkgs.python3.pkgs.toPythonApplication pkgs.python3.pkgs.ydiff;
 

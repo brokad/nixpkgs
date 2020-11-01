@@ -87,8 +87,8 @@ mkDerivation rec {
   enableParallelBuilding = true;
 
   meta = {
-    description = "A system for processing and editing 3D triangular meshes.";
-    homepage = "http://www.meshlab.net/";
+    description = "A system for processing and editing 3D triangular meshes";
+    homepage = "https://www.meshlab.net/";
     license = lib.licenses.gpl3;
     maintainers = with lib.maintainers; [ viric ];
     platforms = with lib.platforms; linux;

@@ -3,16 +3,16 @@
 let
   zshCompletion = version: fetchurl {
     url = "https://raw.githubusercontent.com/coursier/coursier/v${version}/modules/cli/src/main/resources/completions/zsh";
-    sha256 = "1mn6cdmf59nkz5012wgd3gd6hpk2w4629sk8z95230ky8487dac3";
+    sha256 = "0afxzrk9w1qinfsz55jjrxydw0fcv6p722g1q955dl7f6xbab1jh";
   };
 in
 stdenv.mkDerivation rec {
   pname = "coursier";
-  version = "2.0.0-RC6-26";
+  version = "2.0.5";
 
   src = fetchurl {
     url = "https://github.com/coursier/coursier/releases/download/v${version}/coursier";
-    sha256 = "0dpm1q4vxhv9ji87qdnsqvdmi0k5757kkd3p83g116skpkzmymvq";
+    sha256 = "1j614pw8i2mfgrv3jb5q3ifrxkrb7apj13zdrbnvnh4bzwlg5jb2";
   };
 
   nativeBuildInputs = [ makeWrapper ];

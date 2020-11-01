@@ -69,13 +69,22 @@ self: super: {
       name = "git-annex-${super.git-annex.version}-src";
       url = "git://git-annex.branchable.com/";
       rev = "refs/tags/" + super.git-annex.version;
-      sha256 = "19ipaalp9g25zhg44rialwhp2fv5n8q5fzqw72rfcjcca5iy6r72";
+      sha256 = "05yvl09ksyvzykibs95996rni9x6w03yfqyv2fadd73z1m6lq5bf";
     };
   }).override {
     dbus = if pkgs.stdenv.isLinux then self.dbus else null;
     fdo-notify = if pkgs.stdenv.isLinux then self.fdo-notify else null;
     hinotify = if pkgs.stdenv.isLinux then self.hinotify else self.fsnotify;
   };
+
+  # Backport fix for bash: compgen: command not found
+  # which happens in nix-shell when a non-interactive bash is on PATH
+  # PR to master: https://github.com/pcapriotti/optparse-applicative/pull/408
+  optparse-applicative = appendPatch super.optparse-applicative (pkgs.fetchpatch {
+    name = "optparse-applicative-0.15.1-hercules-ci-compgen.diff";
+    url = "https://github.com/hercules-ci/optparse-applicative/compare/0.15.1...hercules-ci:0.15.1-nixpkgs-compgen.diff";
+    sha256 = "1bcp6b7gvc8pqbn1n1ybhizkkl5if7hk9ipgl746vk08v0d3xxql";
+  });
 
   # Fix test trying to access /home directory
   shell-conduit = overrideCabal super.shell-conduit (drv: {
@@ -136,6 +145,14 @@ self: super: {
   halive = if pkgs.stdenv.isDarwin
     then addBuildDepend super.halive pkgs.darwin.apple_sdk.frameworks.AppKit
     else super.halive;
+
+  # Test suite fails due golden tests checking text representation
+  # of normalized dhall expressions, and newer dhall versions format
+  # differently.
+  hpack-dhall =
+    if pkgs.lib.versionOlder "0.5.2" super.hpack-dhall.version
+    then throw "Drop dontCheck override for hpack-dhall > 0.5.2"
+    else dontCheck super.hpack-dhall;
 
   barbly = addBuildDepend super.barbly pkgs.darwin.apple_sdk.frameworks.AppKit;
 
@@ -208,11 +225,11 @@ self: super: {
   # Generating the completions should be activated again, once we default to
   # ghc 8.10.
   hnix = dontCheck (super.hnix.override {
-    # The neat-interpolation package from stack is to old for hnix.
-    # https://github.com/haskell-nix/hnix/issues/676
-    # Once neat-interpolation >= 0.4 is in our stack release,
-    # (which should happen soon), we can remove this override
-    neat-interpolation = self.neat-interpolation_0_5_1_2;
+    # 2020-09-18: Those packages are all needed by hnix at versions newer than on stackage
+    neat-interpolation = self.neat-interpolation_0_5_1_2; # at least 0.5.1
+    data-fix = self.data-fix_0_3_0; # at least 0.3
+    prettyprinter = self.prettyprinter_1_7_0; # at least 1.7
+
   });
 
   # Fails for non-obvious reasons while attempting to use doctest.
@@ -317,8 +334,8 @@ self: super: {
 
   # Needs the latest version of vty and brick.
   matterhorn = super.matterhorn.overrideScope (self: super: {
-    brick = self.brick_0_55;
-    vty = self.vty_5_30;
+    brick = self.brick_0_57;
+    vty = self.vty_5_31;
   });
 
   memcache = dontCheck super.memcache;
@@ -375,7 +392,9 @@ self: super: {
   tickle = dontCheck super.tickle;
   tpdb = dontCheck super.tpdb;
   translatable-intset = dontCheck super.translatable-intset;
-  trifecta = if pkgs.stdenv.hostPlatform.isAarch64 then dontCheck super.trifecta else super.trifecta; # affected by this bug https://gitlab.haskell.org/ghc/ghc/-/issues/15275#note_295461
+  # Aarch64 affected by this bug https://gitlab.haskell.org/ghc/ghc/-/issues/15275#note_295461
+  # Darwin https://hydra.nixos.org/build/129070963/nixlog/1
+  trifecta = if (pkgs.stdenv.hostPlatform.isAarch64 || pkgs.stdenv.isDarwin) then dontCheck super.trifecta else super.trifecta;
   ua-parser = dontCheck super.ua-parser;
   unagi-chan = dontCheck super.unagi-chan;
   wai-logger = dontCheck super.wai-logger;
@@ -675,7 +694,7 @@ self: super: {
         postPatch = ''
           substituteInPlace conf.py --replace "'.md': CommonMarkParser," ""
         '';
-        nativeBuildInputs = with pkgs.buildPackages.pythonPackages; [ sphinx recommonmark sphinx_rtd_theme ];
+        nativeBuildInputs = with pkgs.buildPackages.python3Packages; [ sphinx recommonmark sphinx_rtd_theme ];
         makeFlags = [ "html" ];
         installPhase = ''
           mv _build/html $out
@@ -923,7 +942,7 @@ self: super: {
   dhall-json = generateOptparseApplicativeCompletions ["dhall-to-json" "dhall-to-yaml"] super.dhall-json;
   dhall-nix = generateOptparseApplicativeCompletion "dhall-to-nix" (
     super.dhall-nix.overrideScope (self: super: {
-      dhall = super.dhall_1_35_0;
+      dhall = super.dhall_1_36_0;
       repline = self.repline_0_4_0_0;
       haskeline = self.haskeline_0_8_1_0;
     }));
@@ -1209,15 +1228,11 @@ self: super: {
 
   # this will probably need to get updated with every ghcide update,
   # we need an override because ghcide is tracking haskell-lsp closely.
-  ghcide = dontCheck (appendPatch (super.ghcide.override {
+  ghcide = dontCheck (super.ghcide.overrideScope (self: super: {
     hie-bios = dontCheck super.hie-bios_0_7_1;
-    lsp-test = dontCheck self.lsp-test_0_11_0_5;
-  }) (pkgs.fetchpatch {
-    # This patch loosens the hie-bios upper bound.
-    # It is already merged into upstream and won‘t be needed for ghcide 0.4.0
-    url = "https://github.com/haskell/ghcide/commit/3e1b3620948870a4da8808ca0c0897fbd3ecad16.patch";
-    sha256 = "1jwn7jgi740x6wwv1k0mz9d4z0b9p3mzs54pdg4nfq0h2v7zxchz";
+    lsp-test = dontCheck self.lsp-test_0_11_0_7;
   }));
+  implicit-hie-cradle = super.implicit-hie-cradle.override { hie-bios = dontCheck super.hie-bios_0_7_1; };
 
   # hasn‘t bumped upper bounds
   # upstream: https://github.com/obsidiansystems/which/pull/6
@@ -1311,10 +1326,6 @@ self: super: {
   trial = doJailbreak super.trial;
 
   # 2020-06-24: Tests are broken in hackage distribution.
-  # See: https://github.com/kowainik/stan/issues/316
-  stan = dontCheck super.stan;
-
-  # 2020-06-24: Tests are broken in hackage distribution.
   # See: https://github.com/robstewart57/rdf4h/issues/39
   rdf4h = dontCheck super.rdf4h;
 
@@ -1341,7 +1352,7 @@ self: super: {
   # That's why we need to bump a ton of dependency versions to unbreak them.
   gi-pango = assert super.gi-pango.version == "1.0.22"; self.gi-pango_1_0_23;
   haskell-gi-base = assert super.haskell-gi-base.version == "0.23.0"; addBuildDepends (self.haskell-gi-base_0_24_3) [ pkgs.gobject-introspection ];
-  haskell-gi = assert super.haskell-gi.version == "0.23.1"; self.haskell-gi_0_24_4;
+  haskell-gi = assert super.haskell-gi.version == "0.23.1"; self.haskell-gi_0_24_5;
   gi-cairo = assert super.gi-cairo.version == "1.0.23"; self.gi-cairo_1_0_24;
   gi-glib = assert super.gi-glib.version == "2.0.23"; self.gi-glib_2_0_24;
   gi-gobject = assert super.gi-gobject.version == "2.0.22"; self.gi-gobject_2_0_24;
@@ -1380,16 +1391,6 @@ self: super: {
   # Tests are broken because of missing files in hackage tarball.
   # https://github.com/jgm/commonmark-hs/issues/55
   commonmark-extensions = dontCheck super.commonmark-extensions;
-
-  # Apply version-bump patch that is not contained in released version yet.
-  # Upstream PR: https://github.com/srid/neuron/pull/304
-  neuron = appendPatch super.neuron (pkgs.fetchpatch {
-    url= "https://github.com/srid/neuron/commit/9ddcb7e9d63b8266d1372ef7c14c13b6b5277990.patch";
-    sha256 = "01f9v3jnl05fnpd624wv3a0j5prcbnf62ysa16fbc0vabw19zv1b";
-    excludes = [ "commonmark-hs/github.json" ];
-    stripLen = 2;
-    extraPrefix = "";
-  });
 
   # Testsuite trying to run `which haskeline-examples-Test`
   haskeline_0_8_1_0 = dontCheck super.haskeline_0_8_1_0;
@@ -1462,23 +1463,27 @@ self: super: {
   cryptonite = doDistribute self.cryptonite_0_27;
 
   # We want the latest version of Pandoc.
+  skylighting = doDistribute super.skylighting_0_10_0_3;
+  skylighting-core = doDistribute super.skylighting-core_0_10_0_3;
   hslua = doDistribute self.hslua_1_1_2;
   jira-wiki-markup = doDistribute self.jira-wiki-markup_1_3_2;
-  pandoc = doDistribute self.pandoc_2_10_1;
-  pandoc-citeproc = doDistribute self.pandoc-citeproc_0_17_0_2;
-  pandoc-plot = doDistribute self.pandoc-plot_0_9_2_0;
-  pandoc-types = doDistribute self.pandoc-types_1_21;
+  pandoc = doDistribute self.pandoc_2_11_0_4;
+  # jailbreaking pandoc-citeproc because it has not bumped upper bound on pandoc
+  pandoc-citeproc = doJailbreak (doDistribute self.pandoc-citeproc_0_17_0_2);
+  pandoc-types = doDistribute self.pandoc-types_1_22;
   rfc5051 = doDistribute self.rfc5051_0_2;
 
-  # Upstream forgot to change the Cabal version bounds in the test suite.
-  # See: https://github.com/jaspervdj/stylish-haskell/pull/297
-  # Will be fixed whenever they next bump the version number
-  stylish-haskell = appendPatch super.stylish-haskell (pkgs.fetchpatch {
-    url = "https://github.com/jaspervdj/stylish-haskell/commit/9550aa1cd177aa6fe271d075177109d66a79e67f.patch";
-    sha256 = "1ffnbd2s4fx0ylnnlcyyag119yxb32p5r20b38l39lsa0jwv229f";
-  });
+  # The test suite attempts to read `/etc/resolv.conf`, which doesn't work in the sandbox.
+  domain-auth = dontCheck super.domain-auth;
   # INSERT NEW OVERRIDES ABOVE THIS LINE
 
+  # stack-2.5.1 needs a more current version of pantry to compile
+  pantry = self.pantry_0_5_1_3;
+
+  # Too tight version bounds, see https://github.com/haskell-hvr/microaeson/pull/4
+  microaeson = doJailbreak super.microaeson;
+
+  # haskell-language-server needs a more current version of pantry to compile
 } // (let
   inherit (self) hls-ghcide hls-brittany;
   hlsScopeOverride = self: super: {
@@ -1487,7 +1492,7 @@ self: super: {
     ghcide = dontCheck hls-ghcide;
     # we are faster than stack here
     hie-bios = dontCheck super.hie-bios_0_7_1;
-    lsp-test = dontCheck super.lsp-test_0_11_0_5;
+    lsp-test = dontCheck super.lsp-test_0_11_0_7;
     # fourmolu can‘t compile with an older aeson
     aeson = dontCheck super.aeson_1_5_2_0;
     # brittany has an aeson upper bound of 1.5
@@ -1496,8 +1501,7 @@ self: super: {
     ghc-exactprint = dontCheck super.ghc-exactprint_0_6_3_2;
   };
   in {
-    # jailbreaking for hie-bios 0.7.0 (upstream PR: https://github.com/haskell/haskell-language-server/pull/357)
-    haskell-language-server = dontCheck (doJailbreak (super.haskell-language-server.overrideScope hlsScopeOverride));
+    haskell-language-server = dontCheck (super.haskell-language-server.overrideScope hlsScopeOverride);
     hls-ghcide = dontCheck (super.hls-ghcide.overrideScope hlsScopeOverride);
     hls-brittany = dontCheck (super.hls-brittany.overrideScope hlsScopeOverride);
     fourmolu = dontCheck (super.fourmolu.overrideScope hlsScopeOverride);
