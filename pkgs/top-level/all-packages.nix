@@ -805,6 +805,8 @@ in
 
   analog = callPackage ../tools/admin/analog {};
 
+  angle-grinder = callPackage ../tools/text/angle-grinder {};
+
   ansifilter = callPackage ../tools/text/ansifilter {};
 
   antora = callPackage ../development/tools/documentation/antora {};
@@ -1651,7 +1653,8 @@ in
   candle = libsForQt5.callPackage ../applications/misc/candle { };
 
   capstone = callPackage ../development/libraries/capstone { };
-  unicorn-emu = callPackage ../development/libraries/unicorn-emu { };
+
+  keystone = callPackage ../development/libraries/keystone { };
 
   casync = callPackage ../applications/networking/sync/casync {
     sphinx = python3Packages.sphinx;
@@ -3071,6 +3074,12 @@ in
 
   console-bridge = callPackage ../development/libraries/console-bridge { };
 
+  convbin = callPackage ../tools/misc/convbin { };
+
+  convimg = callPackage ../tools/misc/convimg { };
+
+  convfont = callPackage ../tools/misc/convfont { };
+
   convmv = callPackage ../tools/misc/convmv { };
 
   convoy = callPackage ../tools/filesystems/convoy { };
@@ -3516,7 +3525,7 @@ in
   uudeview = callPackage ../tools/misc/uudeview { };
 
   uutils-coreutils = callPackage ../tools/misc/uutils-coreutils {
-    inherit (pythonPackages) sphinx;
+    inherit (python3Packages) sphinx;
     inherit (darwin.apple_sdk.frameworks) Security;
   };
 
@@ -4231,14 +4240,16 @@ in
 
   google-authenticator = callPackage ../os-specific/linux/google-authenticator { };
 
-  google-cloud-sdk = callPackage ../tools/admin/google-cloud-sdk { };
+  google-cloud-sdk = callPackage ../tools/admin/google-cloud-sdk {
+    python = python3;
+  };
   google-cloud-sdk-gce = google-cloud-sdk.override { with-gce = true; };
 
   google-fonts = callPackage ../data/fonts/google-fonts { };
 
   google-clasp = callPackage ../development/misc/google-clasp { };
 
-  google-compute-engine = python2.pkgs.google-compute-engine;
+  google-compute-engine = with python3.pkgs; toPythonApplication google-compute-engine;
 
   google-compute-engine-oslogin = callPackage ../tools/virtualization/google-compute-engine-oslogin { };
 
@@ -4905,10 +4916,12 @@ in
 
   kalibrate-hackrf = callPackage ../applications/radio/kalibrate-hackrf { };
 
-  wrapKakoune = callPackage ../applications/editors/kakoune/wrapper.nix { };
+  wrapKakoune = kakoune: attrs: callPackage ../applications/editors/kakoune/wrapper.nix (attrs // { inherit kakoune; });
   kakounePlugins = callPackage ../applications/editors/kakoune/plugins { };
   kakoune-unwrapped = callPackage ../applications/editors/kakoune { };
-  kakoune = wrapKakoune kakoune-unwrapped { };
+  kakoune = wrapKakoune kakoune-unwrapped {
+    plugins = [ ];  # override with the list of desired plugins
+  };
 
   kak-lsp = callPackage ../tools/misc/kak-lsp { };
 
@@ -6215,8 +6228,6 @@ in
   p7zip = callPackage ../tools/archivers/p7zip { };
 
   packagekit = callPackage ../tools/package-management/packagekit { };
-
-  packagekit-qt = libsForQt5.callPackage ../tools/package-management/packagekit/qt.nix { };
 
   packetdrill = callPackage ../tools/networking/packetdrill { };
 
@@ -8069,6 +8080,8 @@ in
 
   unbound = callPackage ../tools/networking/unbound { };
 
+  unicorn = callPackage ../development/libraries/unicorn { };
+
   units = callPackage ../tools/misc/units {
     enableCurrenciesUpdater = true;
     pythonPackages = python3Packages;
@@ -8750,8 +8763,6 @@ in
   devpi-server = callPackage ../development/tools/devpi-server {};
 
   dotty = callPackage ../development/compilers/scala/dotty.nix { jre = jre8;};
-
-  drumstick = callPackage ../development/libraries/drumstick { };
 
   ecl = callPackage ../development/compilers/ecl { };
   ecl_16_1_2 = callPackage ../development/compilers/ecl/16.1.2.nix { };
@@ -12351,7 +12362,7 @@ in
 
   cxx-prettyprint = callPackage ../development/libraries/cxx-prettyprint { };
 
-  cxxtest = callPackage ../development/libraries/cxxtest { };
+  cxxtest = python2Packages.callPackage ../development/libraries/cxxtest { };
 
   cypress = callPackage ../development/web/cypress { };
 
@@ -13326,7 +13337,7 @@ in
     let
       mkFrameworks = import ../development/libraries/kde-frameworks;
       attrs = {
-        libsForQt5 = libsForQt514;
+        inherit libsForQt5;
         inherit lib fetchurl;
       };
     in
@@ -13340,8 +13351,6 @@ in
   keybinder3 = callPackage ../development/libraries/keybinder3 {
     automake = automake111x;
   };
-
-  kf5gpgmepp = libsForQt5.callPackage ../development/libraries/kf5gpgmepp { };
 
   krb5 = callPackage ../development/libraries/kerberos/krb5.nix {
     inherit (buildPackages.darwin) bootstrap_cmds;
@@ -15138,8 +15147,6 @@ in
       inherit llvmPackages_5;
     });
 
-  libsForQt512 = recurseIntoAttrs (lib.makeScope qt512.newScope mkLibsForQt5);
-
   qt514 = recurseIntoAttrs (makeOverridable
     (import ../development/libraries/qt-5/5.14) {
       inherit newScope;
@@ -15170,6 +15177,8 @@ in
       inherit llvmPackages_5;
     });
 
+  libsForQt512 = recurseIntoAttrs (lib.makeScope qt512.newScope mkLibsForQt5);
+
   libsForQt514 = recurseIntoAttrs (lib.makeScope qt514.newScope mkLibsForQt5);
 
   libsForQt515 = recurseIntoAttrs (lib.makeScope qt515.newScope mkLibsForQt5);
@@ -15196,17 +15205,41 @@ in
       kwidgetsaddons kwindowsystem kxmlgui kxmlrpcclient modemmanager-qt
       networkmanager-qt plasma-framework prison qqc2-desktop-style solid sonnet
       syntax-highlighting syndication threadweaver kirigami2 kholidays kpurpose
-      kcontacts kquickcharts kdoctools kapidox;
+      kcontacts kquickcharts kdoctools kapidox kdesu kinit kded frameworkintegration
+      kdewebkit breeze-icons
+    ;
 
     ### KDE PLASMA 5
 
     inherit (plasma5.override { libsForQt5 = self; })
-      kdecoration khotkeys libkscreen libksysguard;
+      kdecoration khotkeys libkscreen libksysguard bluedevil
+      breeze-gtk breeze-qt5 breeze-grub breeze-plymouth discover kactivitymanagerd
+      kde-cli-tools kde-gtk-config kdeplasma-addons kgamma5 kinfocenter kmenuedit
+      kscreen kscreenlocker ksshaskpass ksysguard kwallet-pam kwayland-integration
+      kwin kwrited milou oxygen plasma-browser-integration plasma-desktop
+      plasma-integration plasma-nm plasma-pa plasma-vault plasma-workspace
+      plasma-workspace-wallpapers polkit-kde-agent powerdevil sddm-kcm
+      systemsettings user-manager xdg-desktop-portal-kde
+    ;
+
+    inherit ((plasma5.override { libsForQt5 = self; }).thirdParty)
+      plasma-applet-caffeine-plus kwin-dynamic-workspaces kwin-tiling krohnkite
+    ;
 
     ### KDE APPLICATIONS
 
     inherit (kdeApplications.override { libsForQt5 = self; })
-      libkdcraw libkexiv2 libkipi libkomparediff2 libksane;
+      libkdcraw libkexiv2 libkipi libkomparediff2 libksane libkcddb akonadi-contacts
+      akonadi-calendar akonadi-notes akonadi-search kidentitymanagement kontactinterface
+      kldap akonadi akregator ark bomber bovo dolphin dragon elisa ffmpegthumbs filelight
+      granatier gwenview k3b kaddressbook kalzium kapptemplate kapman kate katomic
+      kblackbox kblocks kbounce kcachegrind kcalc kcharselect kcolorchooser
+      kdenlive kdf kdialog kdiamond keditbookmarks kfind kfloppy kget kgpg khelpcenter
+      kig kigo killbots kitinerary kleopatra klettres klines kmag kmail kmines kmix kmplot
+      knavalbattle knetwalk knights kollision kolourpaint kompare konsole kontact korganizer
+      kpkpass krdc kreversi krfb kshisen ksquares ksystemlog kteatime ktimer ktouch kturtle
+      kwalletmanager kwave marble minuet okular picmi spectacle yakuake
+    ;
 
     ### LIBRARIES
 
@@ -15217,6 +15250,8 @@ in
     appstream-qt = callPackage ../development/libraries/appstream/qt.nix { };
 
     dxflib = callPackage ../development/libraries/dxflib {};
+
+    drumstick = callPackage ../development/libraries/drumstick { };
 
     fcitx-qt5 = callPackage ../tools/inputmethods/fcitx/fcitx-qt5.nix { };
 
@@ -15229,6 +15264,8 @@ in
     kdiagram = callPackage ../development/libraries/kdiagram { };
 
     kdsoap = callPackage ../development/libraries/kdsoap { };
+
+    kf5gpgmepp = callPackage ../development/libraries/kf5gpgmepp { };
 
     kproperty = callPackage ../development/libraries/kproperty { };
 
@@ -15249,6 +15286,8 @@ in
     liblastfm = callPackage ../development/libraries/liblastfm { };
 
     libopenshot = callPackage ../applications/video/openshot-qt/libopenshot.nix { };
+
+    packagekit-qt = callPackage ../tools/package-management/packagekit/qt.nix { };
 
     libopenshot-audio = callPackage ../applications/video/openshot-qt/libopenshot-audio.nix { };
 
@@ -15320,6 +15359,9 @@ in
 
     qtwebkit-plugins = callPackage ../development/libraries/qtwebkit-plugins { };
 
+    # Not a library, but we do want it to be built for every qt version there
+    # is, to allow users to choose the right build if needed.
+    sddm = callPackage ../applications/display-managers/sddm { };
   };
 
   qtEnv = qt5.env;
@@ -17602,6 +17644,8 @@ in
 
   crda = callPackage ../os-specific/linux/crda { };
 
+  cshatag = callPackage ../os-specific/linux/cshatag { };
+
   # Darwin package set
   #
   # Even though this is a set of packages not single package, use `callPackage`
@@ -18968,8 +19012,6 @@ in
 
   brise = callPackage ../data/misc/brise { };
 
-  inherit (kdeFrameworks) breeze-icons;
-
   cacert = callPackage ../data/misc/cacert { };
 
   caladea = callPackage ../data/fonts/caladea {};
@@ -19135,7 +19177,9 @@ in
 
   fira-mono = callPackage ../data/fonts/fira-mono { };
 
-  flat-remix-icon-theme = callPackage ../data/icons/flat-remix-icon-theme { };
+  flat-remix-icon-theme = callPackage ../data/icons/flat-remix-icon-theme {
+    inherit (kdeFrameworks) breeze-icons;
+  };
 
   font-awesome_4 = (callPackage ../data/fonts/font-awesome-5 { }).v4;
   font-awesome_5 = (callPackage ../data/fonts/font-awesome-5 { }).v5;
@@ -19294,9 +19338,11 @@ in
 
   luculent = callPackage ../data/fonts/luculent { };
 
-  luna-icons = callPackage ../data/icons/luna-icons { };
+  luna-icons = callPackage ../data/icons/luna-icons {
+    inherit (kdeFrameworks) breeze-icons;
+  };
 
-  maia-icon-theme = callPackage ../data/icons/maia-icon-theme { };
+  maia-icon-theme = libsForQt5.callPackage ../data/icons/maia-icon-theme { };
 
   mailcap = callPackage ../data/misc/mailcap { };
 
@@ -19415,15 +19461,17 @@ in
 
   oxygenfonts = callPackage ../data/fonts/oxygenfonts { };
 
-  inherit (kdeFrameworks) oxygen-icons5;
-
   paper-gtk-theme = callPackage ../data/themes/paper-gtk { };
 
   paper-icon-theme = callPackage ../data/icons/paper-icon-theme { };
 
-  papirus-icon-theme = callPackage ../data/icons/papirus-icon-theme { };
+  papirus-icon-theme = callPackage ../data/icons/papirus-icon-theme {
+    inherit (kdeFrameworks) breeze-icons;
+  };
 
-  papirus-maia-icon-theme = callPackage ../data/icons/papirus-maia-icon-theme { };
+  papirus-maia-icon-theme = callPackage ../data/icons/papirus-maia-icon-theme {
+    inherit (kdeFrameworks) breeze-icons;
+  };
 
   papis = with python3Packages; toPythonApplication papis;
 
@@ -19453,7 +19501,9 @@ in
 
   pop-gtk-theme = callPackage ../data/themes/pop-gtk { };
 
-  pop-icon-theme = callPackage ../data/icons/pop-icon-theme { };
+  pop-icon-theme = callPackage ../data/icons/pop-icon-theme {
+    inherit (kdeFrameworks) breeze-icons;
+  };
 
   posix_man_pages = callPackage ../data/documentation/man-pages-posix { };
 
@@ -19733,7 +19783,9 @@ in
 
   yaru-theme = callPackage ../data/themes/yaru {};
 
-  zafiro-icons = callPackage ../data/icons/zafiro-icons { };
+  zafiro-icons = callPackage ../data/icons/zafiro-icons {
+    inherit (kdeFrameworks) breeze-icons;
+  };
 
   zeal = libsForQt514.callPackage ../data/documentation/zeal { };
 
@@ -20114,9 +20166,12 @@ in
   calibre = calibre-py3;
 
   calligra = libsForQt514.callPackage ../applications/office/calligra {
-    inherit (kdeApplications) akonadi-calendar akonadi-contacts;
     openjpeg = openjpeg_1;
-    poppler = poppler_0_61;
+    poppler = poppler_0_61.override {
+      qt5Support = true;
+      # Must be using the same qt version as calligra itself.
+      qtbase = qt514.qtbase;
+    };
   };
 
   perkeep = callPackage ../applications/misc/perkeep { };
@@ -21692,50 +21747,15 @@ in
     let
       mkApplications = import ../applications/kde;
       attrs = {
-        libsForQt5 = libsForQt514;
+        inherit libsForQt5;
         inherit lib fetchurl;
-        inherit okteta;
       };
     in
       recurseIntoAttrs (makeOverridable mkApplications attrs);
 
-  inherit (kdeApplications)
-    akonadi akregator ark
-    bomber bovo
-    dolphin dragon
-    elisa
-    ffmpegthumbs filelight
-    granatier gwenview
-    k3b
-    kaddressbook kalzium kapptemplate kapman kate katomic
-    kblackbox kblocks kbounce
-    kcachegrind kcalc kcharselect kcolorchooser
-    kdeconnect-kde kdenlive kdf kdialog kdiamond
-    keditbookmarks
-    kfind kfloppy
-    kget kgpg
-    khelpcenter
-    kig kigo killbots kitinerary
-    kleopatra klettres klines
-    kmag kmail kmines kmix kmplot
-    knavalbattle knetwalk knights
-    kollision kolourpaint kompare konsole kontact korganizer
-    kpkpass
-    krdc kreversi krfb
-    kshisen ksquares ksystemlog
-    kteatime ktimer ktouch kturtle
-    kwalletmanager kwave
-    marble minuet
-    okular
-    picmi
-    spectacle
-    yakuake;
-
   okteta = libsForQt5.callPackage ../applications/editors/okteta { };
 
   k4dirstat = libsForQt5.callPackage ../applications/misc/k4dirstat { };
-
-  inherit (kdeFrameworks) kdesu;
 
   kdevelop-pg-qt = libsForQt514.callPackage ../applications/editors/kdevelop5/kdevelop-pg-qt.nix { };
 
@@ -21774,7 +21794,7 @@ in
 
   kid3 = libsForQt5.callPackage ../applications/audio/kid3 { };
 
-  kile = libsForQt514.callPackage ../applications/editors/kile { };
+  kile = libsForQt5.callPackage ../applications/editors/kile { };
 
   kino = callPackage ../applications/video/kino {
     inherit (gnome2) libglade;
@@ -21789,10 +21809,7 @@ in
 
   kmplayer = libsForQt5.callPackage ../applications/video/kmplayer { };
 
-  kmymoney = libsForQt5.callPackage ../applications/office/kmymoney {
-    inherit (kdeApplications) kidentitymanagement;
-    inherit (kdeFrameworks) kdewebkit;
-  };
+  kmymoney = libsForQt5.callPackage ../applications/office/kmymoney { };
 
   kodestudio = callPackage ../applications/editors/kodestudio { };
 
@@ -22370,7 +22387,7 @@ in
     if stdenv.isDarwin then
       callPackage ../applications/audio/musescore/darwin.nix { }
     else
-      libsForQt514.callPackage ../applications/audio/musescore { };
+      libsForQt5.callPackage ../applications/audio/musescore { };
 
   mmh = callPackage ../applications/networking/mailreaders/mmh { };
   mutt = callPackage ../applications/networking/mailreaders/mutt { };
@@ -23487,8 +23504,6 @@ in
 
   robustirc-bridge = callPackage ../servers/irc/robustirc-bridge { };
 
-  sddm = libsForQt514.callPackage ../applications/display-managers/sddm { };
-
   skrooge = libsForQt514.callPackage ../applications/office/skrooge {};
 
   smartgithg = callPackage ../applications/version-management/smartgithg {
@@ -23869,9 +23884,7 @@ in
 
   tribler = callPackage ../applications/networking/p2p/tribler { };
 
-  trojita = libsForQt514.callPackage ../applications/networking/mailreaders/trojita {
-    inherit (kdeApplications) akonadi-contacts;
-  };
+  trojita = libsForQt514.callPackage ../applications/networking/mailreaders/trojita { };
 
   tudu = callPackage ../applications/office/tudu { };
 
@@ -24688,8 +24701,6 @@ in
   zam-plugins = callPackage ../applications/audio/zam-plugins { };
 
   zanshin = libsForQt514.callPackage ../applications/office/zanshin {
-    inherit (kdeApplications) akonadi-calendar akonadi-notes akonadi-search kidentitymanagement kontactinterface kldap;
-    inherit (kdeFrameworks) krunner kwallet kcalendarcore;
     boost = boost160;
   };
 
@@ -25031,9 +25042,6 @@ in
   dhewm3 = callPackage ../games/dhewm3 {};
 
   digikam = libsForQt514.callPackage ../applications/graphics/digikam {
-    inherit (plasma5) oxygen;
-    inherit (kdeApplications) akonadi-contacts;
-    inherit (kdeFrameworks) kcalendarcore;
     opencv3 = opencv3WithoutCuda;
   };
 
@@ -25230,6 +25238,10 @@ in
   instead = callPackage ../games/instead { };
 
   instead-launcher = callPackage ../games/instead-launcher { };
+
+  iortcw = callPackage ../games/iortcw { };
+  # used as base package for iortcw forks
+  iortcw_sp = callPackage ../games/iortcw/sp.nix { };
 
   ivan = callPackage ../games/ivan { };
 
@@ -25909,6 +25921,8 @@ in
   lumina = recurseIntoAttrs (callPackage ../desktops/lumina { });
 
   lxqt = recurseIntoAttrs (import ../desktops/lxqt {
+    # TODO: Update these to qt515 at some point. When doing it, please remove
+    # the choice of libsForQt5*.sddm in sddm's module.
     qt5 = qt514;
     libsForQt5 = libsForQt514;
     inherit pkgs;
@@ -25947,32 +25961,13 @@ in
     let
       mkPlasma5 = import ../desktops/plasma-5;
       attrs = {
-        libsForQt5 = libsForQt514;
+        inherit libsForQt5;
         inherit lib fetchurl;
         gconf = gnome2.GConf;
         inherit gsettings-desktop-schemas;
       };
     in
       recurseIntoAttrs (makeOverridable mkPlasma5 attrs);
-
-  inherit (kdeFrameworks) kded kinit frameworkintegration;
-
-  inherit (plasma5)
-    bluedevil breeze-gtk breeze-qt5 breeze-grub breeze-plymouth discover
-    kactivitymanagerd kde-cli-tools kde-gtk-config kdeplasma-addons kgamma5
-    kinfocenter kmenuedit kscreen kscreenlocker ksshaskpass ksysguard
-    kwallet-pam kwayland-integration kwin kwrited milou oxygen plasma-browser-integration
-    plasma-desktop plasma-integration plasma-nm plasma-pa plasma-vault plasma-workspace
-    plasma-workspace-wallpapers polkit-kde-agent powerdevil sddm-kcm
-    systemsettings user-manager xdg-desktop-portal-kde;
-
-  inherit (plasma5.thirdParty)
-    plasma-applet-caffeine-plus
-    kwin-dynamic-workspaces
-    kwin-tiling
-    krohnkite;
-
-  ### SCIENCE
 
   ### SCIENCE/CHEMISTY
 
@@ -27561,6 +27556,8 @@ in
   opkg = callPackage ../tools/package-management/opkg { };
 
   opkg-utils = callPackage ../tools/package-management/opkg-utils { };
+
+  OSCAR = qt5.callPackage ../applications/misc/OSCAR { };
 
   pgmanage = callPackage ../applications/misc/pgmanage { };
 
