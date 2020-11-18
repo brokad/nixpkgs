@@ -539,6 +539,8 @@ let
 
     minisat = callPackage ../development/ocaml-modules/minisat { };
 
+    mirage = callPackage ../development/ocaml-modules/mirage { };
+
     mirage-block = callPackage ../development/ocaml-modules/mirage-block { };
 
     mirage-bootvar-unix = callPackage ../development/ocaml-modules/mirage-bootvar-unix { };
@@ -598,8 +600,6 @@ let
     mmap =  callPackage ../development/ocaml-modules/mmap { };
 
     mparser =  callPackage ../development/ocaml-modules/mparser { };
-
-    mstruct =  callPackage ../development/ocaml-modules/mstruct { };
 
     mtime =  callPackage ../development/ocaml-modules/mtime { };
 

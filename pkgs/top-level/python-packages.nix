@@ -1250,6 +1250,8 @@ in {
 
   cnvkit = callPackage ../development/python-modules/cnvkit { };
 
+  coconut = callPackage ../development/python-modules/coconut { };
+
   cocotb = callPackage ../development/python-modules/cocotb { };
 
   codecov = callPackage ../development/python-modules/codecov { };
@@ -1350,6 +1352,8 @@ in {
   cppheaderparser = callPackage ../development/python-modules/cppheaderparser { };
 
   cppy = callPackage ../development/python-modules/cppy { };
+
+  cpyparsing = callPackage ../development/python-modules/cpyparsing { };
 
   cram = callPackage ../development/python-modules/cram { };
 
@@ -2007,6 +2011,8 @@ in {
   fastcache = callPackage ../development/python-modules/fastcache { };
 
   fastdtw = callPackage ../development/python-modules/fastdtw { };
+
+  fastecdsa = callPackage ../development/python-modules/fastecdsa { };
 
   fasteners = callPackage ../development/python-modules/fasteners { };
 
@@ -4134,6 +4140,7 @@ in {
   notify-py = callPackage ../development/python-modules/notify-py { };
 
   notmuch = callPackage ../development/python-modules/notmuch { inherit (pkgs) notmuch; };
+  notmuch2 = callPackage ../development/python-modules/notmuch/2.nix { inherit (pkgs) notmuch; };
 
   nototools = callPackage ../data/fonts/noto-fonts/tools.nix { };
 
@@ -5283,6 +5290,8 @@ in {
   pyogg = callPackage ../development/python-modules/pyogg { };
 
   pyomo = callPackage ../development/python-modules/pyomo { };
+
+  phonemizer = callPackage ../development/python-modules/phonemizer { };
 
   pyopencl = callPackage ../development/python-modules/pyopencl { };
 
@@ -7685,6 +7694,14 @@ in {
     };
   };
 
+  wxPython_4_1 = callPackage ../development/python-modules/wxPython/4.1.nix {
+    inherit (pkgs) pkgconfig;
+    wxGTK = pkgs.wxGTK31.override {
+      withGtk2 = false;
+      withWebKit = true;
+    };
+  };
+
   wxPython = self.wxPython30;
 
   x11_hash = callPackage ../development/python-modules/x11_hash { };
@@ -7833,7 +7850,7 @@ in {
 
   zeep = callPackage ../development/python-modules/zeep { };
 
-  zeitgeist = disabledIf isPy3k (toPythonModule (pkgs.zeitgeist.override { python2Packages = self; })).py;
+  zeitgeist = (toPythonModule (pkgs.zeitgeist.override { python3 = python; })).py;
 
   zerobin = callPackage ../development/python-modules/zerobin { };
 
