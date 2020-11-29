@@ -332,6 +332,20 @@ let
     };
   };
 
+  AnyEventAIO = buildPerlPackage {
+    pname ="AnyEvent-AIO";
+    version = "1.1";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/M/ML/MLEHMANN/AnyEvent-AIO-1.1.tar.gz";
+      sha256 = "0svh0mlp17g0ypq8bgs3h3axg8v7h0z45hryacgn6q8mcj65n43b";
+    };
+    propagatedBuildInputs = [ AnyEvent IOAIO ];
+    meta = {
+      description = "Truly asynchronous file and directory I/O";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+    };
+  };
+
   AnyEventCacheDNS = buildPerlModule {
     pname = "AnyEvent-CacheDNS";
     version = "0.08";
@@ -511,10 +525,10 @@ let
     buildInputs = [ DataDump FileWhich Readonly TestDifferences TestTrap ];
     preCheck = "rm t/30cluster.t"; # do not run failing tests
     postInstall = ''
-      mkdir -p $out/etc/bash_completion.d
+      mkdir -p $out/share/bash-completion/completions
       mv $out/bin/clusterssh_bash_completion.dist \
-         $out/etc/bash_completion.d/clusterssh_bash_completion
-      substituteInPlace $out/etc/bash_completion.d/clusterssh_bash_completion \
+         $out/share/bash-completion/completions/clusterssh_bash_completion
+      substituteInPlace $out/share/bash-completion/completions/clusterssh_bash_completion \
          --replace '/bin/true' '${pkgs.coreutils}/bin/true' \
          --replace 'grep' '${pkgs.gnugrep}/bin/grep' \
          --replace 'sed' '${pkgs.gnused}/bin/sed'
@@ -3118,6 +3132,23 @@ let
        description = "TidyAll plugin to sort and align Moose-style attributes";
        license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
      };
+  };
+
+  CommandRunner = buildPerlModule {
+    pname = "Command-Runner";
+    version = "0.103";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/S/SK/SKAJI/Command-Runner-0.103.tar.gz";
+      sha256 = "0f180b5c3b3fc9db7b83d4a5fdd959db34f7d6d2472f817dbf8b4b795a9dc82a";
+    };
+    buildInputs = [ ModuleBuildTiny ];
+    propagatedBuildInputs = [ CaptureTiny StringShellQuote Win32ShellQuote ];
+    meta = {
+      homepage = "https://github.com/skaji/Command-Runner";
+      description = "Run external commands and Perl code refs";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+      maintainers = [ maintainers.zakame ];
+    };
   };
 
   commonsense = buildPerlPackage {
@@ -9941,6 +9972,25 @@ let
     };
   };
 
+  IOAIO = buildPerlPackage {
+    pname = "IO-AIO";
+    version = "4.72";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/M/ML/MLEHMANN/IO-AIO-4.72.tar.gz";
+      sha256 = "17vfbqagpab8lsbf5nmp2frvxw7hvsyy2i87dpid8djzr615wnvf";
+    };
+    buildInputs = [ CanaryStability ];
+    propagatedBuildInputs = [ commonsense ];
+    nativeBuildInputs = stdenv.lib.optional stdenv.isDarwin shortenPerlShebang;
+    postInstall = stdenv.lib.optionalString stdenv.isDarwin ''
+      shortenPerlShebang $out/bin/treescan
+    '';
+    meta = {
+      description = "Asynchronous/Advanced Input/Output";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+    };
+  };
+
   IOAll = buildPerlPackage {
     pname = "IO-All";
     version = "0.87";
@@ -15673,6 +15723,22 @@ let
     propagatedBuildInputs = [ Moo ];
   };
 
+  ParallelPipes = buildPerlModule {
+    pname = "Parallel-Pipes";
+    version = "0.005";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/S/SK/SKAJI/Parallel-Pipes-0.005.tar.gz";
+      sha256 = "44bd9e2be33d7b314f81c9b886a95d53514689090635f9fad53181f2d3051fd5";
+    };
+    buildInputs = [ ModuleBuildTiny ];
+    meta = {
+      homepage = "https://github.com/skaji/Parallel-Pipes";
+      description = "Parallel processing using pipe(2) for communication and synchronization";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+      maintainers = [ maintainers.zakame ];
+    };
+  };
+
   ParallelPrefork = buildPerlPackage {
     pname = "Parallel-Prefork";
     version = "0.18";
@@ -19245,6 +19311,22 @@ let
     };
   };
 
+  TermReadPassword = buildPerlPackage rec {
+    pname = "Term-ReadPassword";
+    version = "0.11";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/P/PH/PHOENIX/${pname}-${version}.tar.gz";
+      sha256 = "08s3zdqbr01qf4h8ryc900qq1cjcdlyy2dq0gppzzy9mbcs6da71";
+    };
+
+    outputs = [ "out" ];
+
+    meta = {
+      description = "This module lets you ask the user for a password in the traditional way, from the keyboard, without echoing";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+    };
+  };
+
   TermShell = buildPerlModule {
     pname = "Term-Shell";
     version = "0.11";
@@ -21211,6 +21293,21 @@ let
     };
   };
 
+  TextMultiMarkdown = buildPerlPackage {
+    pname = "Text-MultiMarkdown";
+    version = "1.000035";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/B/BO/BOBTFISH/Text-MultiMarkdown-1.000035.tar.gz";
+      sha256 = "2467dd13751dc2979d7c880b24e762952130fdf42a1ed3ee04fdf72d4b52646a";
+    };
+    buildInputs = [ ListMoreUtils TestException ];
+    propagatedBuildInputs = [ HTMLParser TextMarkdown ];
+    meta = {
+      description = "Convert MultiMarkdown syntax to (X)HTML";
+      license = stdenv.lib.licenses.bsd3;
+    };
+  };
+
   TestNumberDelta = buildPerlPackage {
     pname = "Test-Number-Delta";
     version = "1.06";
@@ -22457,6 +22554,21 @@ let
     propagatedBuildInputs = [ URI ];
     meta = {
       description = "Database of robots.txt-derived permissions";
+      license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
+    };
+  };
+
+  WWWTwilioAPI = buildPerlPackage {
+    pname = "WWW-Twilio-API";
+    version = "0.21";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/S/SC/SCOTTW/WWW-Twilio-API-0.21.tar.gz";
+      sha256 = "582db53a091f8da3670c037733314f2510af5e8ee0ba42a0e391e2f2e3ca7734";
+    };
+    prePatch = "rm examples.pl";
+    propagatedBuildInputs = [ LWPProtocolhttps ];
+    meta = {
+      description = "Accessing Twilio's REST API with Perl";
       license = with stdenv.lib.licenses; [ artistic1 gpl1Plus ];
     };
   };
