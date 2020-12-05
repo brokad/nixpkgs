@@ -147,6 +147,7 @@
   ./programs/npm.nix
   ./programs/oblogout.nix
   ./programs/plotinus.nix
+  ./programs/proxychains.nix
   ./programs/qt5ct.nix
   ./programs/screen.nix
   ./programs/sedutil.nix
@@ -396,6 +397,7 @@
   ./services/logging/rsyslogd.nix
   ./services/logging/syslog-ng.nix
   ./services/logging/syslogd.nix
+  ./services/logging/vector.nix
   ./services/mail/clamsmtp.nix
   ./services/mail/davmail.nix
   ./services/mail/dkimproxy-out.nix
