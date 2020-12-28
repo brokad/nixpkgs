@@ -1,10 +1,10 @@
 { stdenv, wrapQtAppsHook, makeDesktopItem
 , fetchFromGitHub
-, fetchpatch
 , cmake, qttools, pkgconfig
 , qtbase, qtdeclarative, qtgraphicaleffects
 , qtmultimedia, qtxmlpatterns
 , qtquickcontrols, qtquickcontrols2
+, qtmacextras
 , monero, miniupnpc, unbound, readline
 , boost, libunwind, libsodium, pcsclite
 , randomx, zeromq, libgcrypt, libgpgerror
@@ -28,13 +28,13 @@ in
 
 stdenv.mkDerivation rec {
   pname = "monero-gui";
-  version = "0.17.1.4";
+  version = "0.17.1.7";
 
   src = fetchFromGitHub {
     owner  = "monero-project";
     repo   = "monero-gui";
     rev    = "v${version}";
-    sha256 = "1ixjfdlvwr2an2s9jaql240bk7jpq5hhm5c4hww0bicyy3fp12ng";
+    sha256 = "1dd2ddkxh9ynxnscysl46hj4dm063h1v13fnyah69am26qzzbby4";
   };
 
   nativeBuildInputs = [
@@ -50,7 +50,8 @@ stdenv.mkDerivation rec {
     randomx libgcrypt libgpgerror
     boost libunwind libsodium pcsclite
     zeromq hidapi rapidjson
-  ] ++ optionals trezorSupport [ libusb1 protobuf python3 ];
+  ] ++ optionals trezorSupport [ libusb1 protobuf python3 ]
+    ++ optionals stdenv.isDarwin [ qtmacextras ];
 
   postUnpack = ''
     # copy monero sources here
@@ -59,14 +60,7 @@ stdenv.mkDerivation rec {
     chmod -R +w source/monero
   '';
 
-  patches = [
-    ./move-log-file.patch
-    # fix build failure due to invalid use of CMAKE_PREFIX_PATH
-    (fetchpatch {
-      url = "https://github.com/monero-project/monero-gui/commit/ef2be82c21b0934522ad8e110805b66f5948da1f.patch";
-      sha256 = "1rhazk2xwa5dv1cmkrkq8yr08qxslg4k929cvlliabrx20kbr5z5";
-    })
-  ];
+  patches = [ ./move-log-file.patch ];
 
   postPatch = ''
     # set monero-gui version
@@ -113,7 +107,6 @@ stdenv.mkDerivation rec {
     homepage     = "https://getmonero.org/";
     license      = licenses.bsd3;
     platforms    = platforms.all;
-    badPlatforms = platforms.darwin;
     maintainers  = with maintainers; [ rnhmjoj ];
   };
 }

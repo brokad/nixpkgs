@@ -13,30 +13,25 @@
 , bison, gperf
 , glib, gtk3, dbus-glib
 , glibc
-, libXScrnSaver, libXcursor, libXtst, libGLU, libGL
+, libXScrnSaver, libXcursor, libXtst, libxshmfence, libGLU, libGL
 , protobuf, speechd, libXdamage, cups
 , ffmpeg, libxslt, libxml2, at-spi2-core
 , jre8
 , pipewire_0_2
+, libva
 
 # optional dependencies
 , libgcrypt ? null # gnomeSupport || cupsSupport
-, libva ? null # useVaapi
 , libdrm ? null, wayland ? null, mesa ? null, libxkbcommon ? null # useOzone
 
 # package customization
-, useOzone ? false
-, useVaapi ? !(useOzone || stdenv.isAarch64) # Built if supported, but disabled in the wrapper
-# VA-API TODOs:
-# - Ozone: M81 fails to build due to "ozone_platform_gbm = false"
-#   - Possible solutions: Write a patch to fix the build (wrong gn dependencies)
-#     or build with minigbm
-# - AArch64: Causes serious regressions (https://github.com/NixOS/nixpkgs/pull/85253#issuecomment-614405879)
+, useOzone ? true
 , gnomeSupport ? false, gnome ? null
 , gnomeKeyringSupport ? false, libgnome-keyring3 ? null
 , proprietaryCodecs ? true
 , cupsSupport ? true
 , pulseSupport ? false, libpulseaudio ? null
+, ungoogled ? false, ungoogled-chromium
 
 , channel
 , upstream-info
@@ -115,6 +110,10 @@ let
             result
        else result;
 
+  ungoogler = ungoogled-chromium {
+    inherit (upstream-info.deps.ungoogled-patches) rev sha256;
+  };
+
   base = rec {
     name = "${packageName}-unwrapped-${version}";
     inherit (upstream-info) version;
@@ -137,12 +136,12 @@ let
       util-linux alsaLib
       bison gperf kerberos
       glib gtk3 dbus-glib
-      libXScrnSaver libXcursor libXtst libGLU libGL
+      libXScrnSaver libXcursor libXtst libxshmfence libGLU libGL
       pciutils protobuf speechd libXdamage at-spi2-core
       jre
       pipewire_0_2
-    ] ++ optional useVaapi libva
-      ++ optional gnomeKeyringSupport libgnome-keyring3
+      libva
+    ] ++ optional gnomeKeyringSupport libgnome-keyring3
       ++ optionals gnomeSupport [ gnome.GConf libgcrypt ]
       ++ optionals cupsSupport [ libgcrypt cups ]
       ++ optional pulseSupport libpulseaudio
@@ -214,15 +213,18 @@ let
     '' + optionalString stdenv.isAarch64 ''
       substituteInPlace build/toolchain/linux/BUILD.gn \
         --replace 'toolprefix = "aarch64-linux-gnu-"' 'toolprefix = ""'
+    '' + optionalString ungoogled ''
+      ${ungoogler}/utils/prune_binaries.py . ${ungoogler}/pruning.list || echo "some errors"
+      ${ungoogler}/utils/patches.py . ${ungoogler}/patches
+      ${ungoogler}/utils/domain_substitution.py apply -r ${ungoogler}/domain_regex.list -f ${ungoogler}/domain_substitution.list -c ./ungoogled-domsubcache.tar.gz .
     '';
 
     gnFlags = mkGnFlags ({
       custom_toolchain = "//build/toolchain/linux/unbundle:default";
       host_toolchain = "//build/toolchain/linux/unbundle:default";
       is_official_build = true;
-      is_debug = false;
 
-      proprietary_codecs = false;
+      use_vaapi = !stdenv.isAarch64; # TODO: Remove once M88 is released
       use_sysroot = false;
       use_gnome_keyring = gnomeKeyringSupport;
       use_gio = gnomeSupport;
@@ -238,7 +240,6 @@ let
       rtc_use_pipewire = true;
 
       treat_warnings_as_errors = false;
-      is_clang = stdenv.cc.isClang;
       clang_use_chrome_plugins = false;
       blink_symbol_level = 0;
       symbol_level = 0;
@@ -256,14 +257,11 @@ let
       proprietary_codecs = true;
       enable_hangout_services_extension = true;
       ffmpeg_branding = "Chrome";
-    } // optionalAttrs useVaapi {
-      use_vaapi = true;
     } // optionalAttrs pulseSupport {
       use_pulseaudio = true;
       link_pulseaudio = true;
     } // optionalAttrs useOzone {
       use_ozone = true;
-      ozone_platform_gbm = false;
       use_xkbcommon = true;
       use_glib = true;
       use_gtk = true;
@@ -271,6 +269,24 @@ let
       use_system_minigbm = true;
       use_system_libdrm = true;
       system_wayland_scanner_path = "${wayland}/bin/wayland-scanner";
+    } // optionalAttrs ungoogled {
+      chrome_pgo_phase = 0;
+      enable_hangout_services_extension = false;
+      enable_js_type_check = false;
+      enable_mdns = false;
+      enable_nacl_nonsfi = false;
+      enable_one_click_signin = false;
+      enable_reading_list = false;
+      enable_remoting = false;
+      enable_reporting = false;
+      enable_service_discovery = false;
+      exclude_unwind_tables = true;
+      google_api_key = "";
+      google_default_client_id = "";
+      google_default_client_secret = "";
+      safe_browsing_mode = 0;
+      use_official_google_api_keys = false;
+      use_unofficial_version_number = false;
     } // (extraAttrs.gnFlags or {}));
 
     configurePhase = ''

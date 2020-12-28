@@ -26,6 +26,19 @@
    <listitem>
     <para>GNOME desktop environment was upgraded to 3.38, see its <link xlink:href="https://help.gnome.org/misc/release-notes/3.38/">release notes</link>.</para>
    </listitem>
+   <listitem>
+    <para>
+     <link xlink:href="https://www.gnuradio.org/">GNURadio</link> 3.8 was
+     <link xlink:href="https://github.com/NixOS/nixpkgs/issues/82263">finnally</link>
+     packaged, along with a rewrite to the Nix expressions, allowing users to
+     override the features upstream supports selecting to compile or not to.
+     Additionally, the attribute <code>gnuradio</code> and <code>gnuradio3_7</code>
+     now point to an externally wrapped by default derivations, that allow you to
+     also add `extraPythonPackages` to the Python interpreter used by GNURadio.
+     Missing environmental variables needed for operational GUI were also added
+     (<link xlink:href="https://github.com/NixOS/nixpkgs/issues/75478">#7547</link>).
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
@@ -252,6 +265,36 @@
       located in <literal>/run/rspamd</literal> instead of <literal>/run</literal>.
     </para>
    </listitem>
+   <listitem>
+    <para>
+      Enabling the Tor client no longer silently also enables and
+      configures Privoxy, and the
+      <varname>services.tor.client.privoxy.enable</varname> option has
+      been removed.  To enable Privoxy, and to configure it to use
+      Tor's faster port, use the following configuration:
+    </para>
+    <programlisting>
+      <xref linkend="opt-services.privoxy.enable" /> = true;
+      <xref linkend="opt-services.privoxy.enableTor" /> = true;
+    </programlisting>
+   </listitem>
+   <listitem>
+     <para>
+       The options <literal>services.slurm.dbdserver.storagePass</literal>
+       and <literal>services.slurm.dbdserver.configFile</literal> have been removed.
+       Use <literal>services.slurm.dbdserver.storagePassFile</literal> instead to provide the database password.
+       Extra config options can be given via the option <literal>services.slurm.dbdserver.extraConfig</literal>. The actual configuration file is created on the fly on startup of the service.
+       This avoids that the password gets exposed in the nix store.
+     </para>
+   </listitem>
+   <listitem>
+     <para>
+       Starting with version 1.7.0, the project formerly named <literal>CodiMD</literal>
+       is now named <literal>HedgeDoc</literal>.
+       New installations will no longer use the old name for users, state directories and such, this needs to be considered when moving state to a more recent NixOS installation.
+       Based on <xref linkend="opt-system.stateVersion" />, existing installations will continue to work.
+     </para>
+   </listitem>
   </itemizedlist>
  </section>
 
@@ -263,6 +306,19 @@
   <title>Other Notable Changes</title>
 
   <itemizedlist>
+   <listitem>
+    <para>
+     The Mailman NixOS module (<literal>services.mailman</literal>) has a new
+     option <xref linkend="opt-services.mailman.enablePostfix" />, defaulting
+     to true, that controls integration with Postfix.
+    </para>
+    <para>
+     If this option is disabled, default MTA config becomes not set and you
+     should set the options in <literal>services.mailman.settings.mta</literal>
+     according to the desired configuration as described in
+     <link xlink:href="https://mailman.readthedocs.io/en/latest/src/mailman/docs/mta.html">Mailman documentation</link>.
+    </para>
+   </listitem>
    <listitem>
     <para>
      The default-version of <literal>nextcloud</literal> is <package>nextcloud20</package>.
@@ -346,6 +402,13 @@
    </listitem>
    <listitem>
     <para>
+     The <literal>services.dnscrypt-proxy2</literal> module now takes the upstream's example configuration and updates it with the user's settings.
+
+     An option has been added to restore the old behaviour if you prefer to declare the configuration from scratch.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
      NixOS now defaults to the unified cgroup hierarchy (cgroupsv2).
      See the <link xlink:href="https://www.redhat.com/sysadmin/fedora-31-control-group-v2">Fedora Article for 31</link>
      for details on why this is desirable, and how it impacts containers.
@@ -355,6 +418,32 @@
      you can switch back to the old behaviour by setting
      <xref linkend="opt-systemd.enableUnifiedCgroupHierarchy"/> = <literal>false</literal>;
      and rebooting.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     PulseAudio was upgraded to 14.0, with changes to the handling of default sinks.
+     See its <link xlink:href="https://www.freedesktop.org/wiki/Software/PulseAudio/Notes/14.0/">release notes</link>.
+    </para>
+
+    <para>
+     GNOME users may wish to delete their <literal>~/.config/pulse</literal> due to the changes to stream routing
+     logic. See <link xlink:href="https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/832">PulseAudio bug 832</link>
+     for more information.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The <package>zookeeper</package> package does not provide
+     <literal>zooInspector.sh</literal> anymore, as that "contrib" has
+     been dropped from upstream releases.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <xref linkend="opt-users.users._name_.createHome" /> now always ensures home directory permissions to be <literal>0700</literal>.
+     Permissions had previously been ignored for already existing home directories, possibly leaving them readable by others.
+     The option's description was incorrect regarding ownership management and has been simplified greatly.
     </para>
    </listitem>
   </itemizedlist>

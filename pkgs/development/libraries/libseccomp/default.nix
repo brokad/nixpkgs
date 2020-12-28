@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   pname = "libseccomp";
-  version = "2.5.0";
+  version = "2.5.1";
 
   src = fetchurl {
     url = "https://github.com/seccomp/libseccomp/releases/download/v${version}/libseccomp-${version}.tar.gz";
-    sha256 = "1wql62cg8f95cwpy057cl764nni9g4sdn5lqj68x22kjs8w71yhz";
+    sha256 = "0m8dlg1v7kflcxvajs4p76p275qwsm2abbf5mfapkakp7hw7wc7f";
   };
 
   outputs = [ "out" "lib" "dev" "man" "pythonsrc" ];
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   # src input for buildPythonPackage calls
   postInstall = ''
     cp -R ./src/python/ tmp-pythonsrc/
-    tar -zcf $pythonsrc --transform s/tmp-pythonsrc/python-foundationdb/ ./tmp-pythonsrc/
+    tar -zcf $pythonsrc --mtime="@$SOURCE_DATE_EPOCH" --sort=name --transform s/tmp-pythonsrc/python-foundationdb/ ./tmp-pythonsrc/
   '';
 
   meta = with stdenv.lib; {

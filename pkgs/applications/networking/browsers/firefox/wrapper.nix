@@ -1,5 +1,5 @@
 { stdenv, lib, makeDesktopItem, makeWrapper, lndir, config
-, replace, fetchurl, zip, unzip, jq
+, replace, fetchurl, zip, unzip, jq, xdg_utils, writeText
 
 ## various stuff that can be plugged in
 , flashplayer, hal-flash
@@ -41,7 +41,7 @@ let
     # https://github.com/mozilla/policy-templates#enterprisepoliciesenabled
     , extraPolicies ? {}
     , firefoxLibName ? "firefox" # Important for tor package or the like
-    , extraExtensions ? [ ]
+    , nixExtensions ? null
     }:
 
     assert forceWayland -> (browser ? gtk3); # Can only use the wayland backend if gtk3 is being used
@@ -97,22 +97,29 @@ let
       #   EXTRA PREF CHANGES  #
       #                       #
       #########################
-      policiesJson = builtins.toFile "policies.json"
-        (builtins.toJSON enterprisePolicies);
+      policiesJson = writeText "policies.json" (builtins.toJSON enterprisePolicies);
 
-      extensions = builtins.map (a:
+      usesNixExtensions = nixExtensions != null;
+
+      nameArray = builtins.map(a: a.name) (if usesNixExtensions then nixExtensions else []);
+
+      # Check that every extension has a unqiue .name attribute
+      # and an extid attribute
+      extensions = if nameArray != (lib.unique nameArray) then
+        throw "Firefox addon name needs to be unique"
+      else builtins.map (a:
         if ! (builtins.hasAttr "extid" a) then
-        throw "extraExtensions has an invalid entry. Missing extid attribute. Please use fetchfirefoxaddon"
+        throw "nixExtensions has an invalid entry. Missing extid attribute. Please use fetchfirefoxaddon"
         else
         a
-      ) extraExtensions;
+      ) (if usesNixExtensions then nixExtensions else []);
 
       enterprisePolicies =
       {
-        policies = {
+        policies = lib.optionalAttrs usesNixExtensions  {
           DisableAppUpdate = true;
         } //
-        {
+        lib.optionalAttrs usesNixExtensions {
           ExtensionSettings = {
             "*" = {
                 blocked_install_message = "You can't have manual extension mixed with nix extensions";
@@ -126,18 +133,25 @@ let
                 };
               }
             ) {} extensions;
-        }
+          } //
+          {
+            Extensions = {
+              Install = lib.foldr (e: ret:
+                ret ++ [ "${e.outPath}/${e.extid}.xpi" ]
+                ) [] extensions;
+            };
+          }
         // extraPolicies;
       };
 
-      mozillaCfg = builtins.toFile "mozilla.cfg" ''
-// First line must be a comment
+      mozillaCfg =  writeText "mozilla.cfg" ''
+        // First line must be a comment
 
         // Disables addon signature checking
         // to be able to install addons that do not have an extid
         // Security is maintained because only user whitelisted addons
         // with a checksum can be installed
-        lockPref("xpinstall.signatures.required", false);
+        ${ lib.optionalString usesNixExtensions ''lockPref("xpinstall.signatures.required", false)'' };
         ${extraPrefs}
       '';
 
@@ -249,6 +263,7 @@ let
             --suffix LD_LIBRARY_PATH ':' "$libs" \
             --suffix-each GTK_PATH ':' "$gtk_modules" \
             --suffix-each LD_PRELOAD ':' "$(cat $(filterExisting $(addSuffix /extra-ld-preload $plugins)))" \
+            --prefix PATH ':' "${xdg_utils}/bin" \
             --prefix-contents PATH ':' "$(filterExisting $(addSuffix /extra-bin-path $plugins))" \
             --suffix PATH ':' "$out${browser.execdir or "/bin"}" \
             --set MOZ_APP_LAUNCHER "${browserName}${nameSuffix}" \
@@ -317,18 +332,13 @@ let
         # preparing for autoconfig
         mkdir -p "$out/lib/${firefoxLibName}/defaults/pref"
 
-        cat > "$out/lib/${firefoxLibName}/defaults/pref/autoconfig.js" <<EOF
-          pref("general.config.filename", "mozilla.cfg");
-          pref("general.config.obscure_value", 0);
-        EOF
+        echo 'pref("general.config.filename", "mozilla.cfg");' > "$out/lib/${firefoxLibName}/defaults/pref/autoconfig.js"
+        echo 'pref("general.config.obscure_value", 0);' >> "$out/lib/${firefoxLibName}/defaults/pref/autoconfig.js"
 
         cat > "$out/lib/${firefoxLibName}/mozilla.cfg" < ${mozillaCfg}
 
         mkdir -p $out/lib/${firefoxLibName}/distribution/extensions
 
-        for i in ${toString extensions}; do
-          ln -s -t $out/lib/${firefoxLibName}/distribution/extensions $i/*
-        done
         #############################
         #                           #
         #   END EXTRA PREF CHANGES  #

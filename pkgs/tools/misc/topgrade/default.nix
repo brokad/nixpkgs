@@ -2,16 +2,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "topgrade";
-  version = "6.0.0";
+  version = "6.0.2";
 
   src = fetchFromGitHub {
     owner = "r-darwish";
     repo = pname;
     rev = "v${version}";
-    sha256 = "15ad30svvr775dxp5gwlq73xydsqwfpw650c3c3ma4jshw36w0x4";
+    sha256 = "1pqf7rs9b8j54rwg8i8alvf65c4jfp5q2hv3yr60aiidfjrawp34";
   };
 
-  cargoSha256 = "0bwy2y44czhvckipvjn28j6ds1pnbj38i29hvlv4f782imfn92hz";
+  cargoSha256 = "1wh7xywp92h3in9a2nr6sia6l3852kw4s688sr1c2wjdf2i58lsg";
 
   buildInputs = lib.optional stdenv.isDarwin Foundation;
 

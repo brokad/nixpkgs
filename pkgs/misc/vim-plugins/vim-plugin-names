@@ -38,6 +38,7 @@ brennanfee/vim-gui-position
 bronson/vim-trailing-whitespace
 brooth/far.vim
 buoto/gotests-vim
+camspiers/lens.vim
 carlitux/deoplete-ternjs
 ccarpita/rtorrent-syntax-file
 cespare/vim-toml
@@ -120,6 +121,8 @@ flazz/vim-colorschemes
 floobits/floobits-neovim
 freitass/todo.txt-vim
 frigoeu/psc-ide-vim
+fruit-in/brainfuck-vim
+fruit-in/vim-nong-theme
 fsharp/vim-fsharp
 fszymanski/deoplete-emoji
 garbas/vim-snipmate
@@ -176,6 +179,7 @@ itchyny/vim-gitbranch
 ivanov/vim-ipython
 jackguo380/vim-lsp-cxx-highlight
 jacoborus/tender.vim
+jakwings/vim-pony
 jaredgorski/SpaceCamp
 jaxbot/semantic-highlight.vim
 JazzCore/ctrlp-cmatcher
@@ -197,8 +201,9 @@ jnurmine/zenburn
 jonbri/vim-colorstepper
 jonsmithers/vim-html-template-literals
 joonty/vim-xdebug
+josa42/vim-lightline-coc
 joshdick/onedark.vim
-jpalardy/vim-slime
+jpalardy/vim-slime@main
 jparise/vim-graphql
 jparise/vim-phabricator
 jreybert/vimagit
@@ -492,6 +497,7 @@ Shougo/vimproc.vim
 Shougo/vimshell.vim
 shumphrey/fugitive-gitlab.vim
 sickill/vim-pasta
+SidOfc/mkdx
 simnalamburt/vim-mundo
 SirVer/ultisnips
 sjl/gundo.vim
@@ -502,6 +508,7 @@ sodapopcan/vim-twiggy
 solarnz/arcanist.vim
 sonph/onehalf
 steelsojka/completion-buffers
+srcery-colors/srcery-vim
 stefandtw/quickfix-reflector.vim
 stephpy/vim-yaml
 sunaku/vim-dasht

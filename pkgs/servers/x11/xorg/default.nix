@@ -703,11 +703,11 @@ lib.makeScope newScope (self: with self; {
   }) {};
 
   libX11 = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, libxcb, xtrans }: stdenv.mkDerivation {
-    name = "libX11-1.6.12";
+    name = "libX11-1.7.0";
     builder = ./builder.sh;
     src = fetchurl {
-      url = "mirror://xorg/individual/lib/libX11-1.6.12.tar.bz2";
-      sha256 = "1ivfzl1qwk8zh7gc0m5vb58gdxz11jwg7w3d356w16j1d5s2427i";
+      url = "mirror://xorg/individual/lib/libX11-1.7.0.tar.bz2";
+      sha256 = "0m6bfwllr3pq2c00l51y62yiq15kphc8dw69zf67qhwmclxzkj1n";
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
@@ -2692,11 +2692,11 @@ lib.makeScope newScope (self: with self; {
   }) {};
 
   xorgserver = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, openssl, libX11, libXau, libXaw, libxcb, xcbutil, xcbutilwm, xcbutilimage, xcbutilkeysyms, xcbutilrenderutil, libXdmcp, libXfixes, libxkbfile, libXmu, libXpm, libXrender, libXres, libXt }: stdenv.mkDerivation {
-    name = "xorg-server-1.20.9";
+    name = "xorg-server-1.20.10";
     builder = ./builder.sh;
     src = fetchurl {
-      url = "mirror://xorg/individual/xserver/xorg-server-1.20.9.tar.bz2";
-      sha256 = "0w9mrnffvjgmwi50kln15i8rpdskxv97r78l75wlcmg4vzhg46g2";
+      url = "mirror://xorg/individual/xserver/xorg-server-1.20.10.tar.bz2";
+      sha256 = "16bwrf0ag41l7jbrllbix8z6avc5yimga7ihvq4ch3a5hb020x4p";
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
@@ -2731,11 +2731,11 @@ lib.makeScope newScope (self: with self; {
   }) {};
 
   xprop = callPackage ({ stdenv, pkgconfig, fetchurl, libX11, xorgproto }: stdenv.mkDerivation {
-    name = "xprop-1.2.4";
+    name = "xprop-1.2.5";
     builder = ./builder.sh;
     src = fetchurl {
-      url = "mirror://xorg/individual/app/xprop-1.2.4.tar.bz2";
-      sha256 = "0lzp7kyhpwd5hm83j2zm6j3w3z1z5i4ykgg2nwr01ij6dq4znxwc";
+      url = "mirror://xorg/individual/app/xprop-1.2.5.tar.bz2";
+      sha256 = "18ckr8g1z50zkc01hprkpm1npwbq32yqib4b3l98c95z2q1yv4lv";
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
@@ -2744,11 +2744,11 @@ lib.makeScope newScope (self: with self; {
   }) {};
 
   xrandr = callPackage ({ stdenv, pkgconfig, fetchurl, libX11, xorgproto, libXrandr, libXrender }: stdenv.mkDerivation {
-    name = "xrandr-1.5.0";
+    name = "xrandr-1.5.1";
     builder = ./builder.sh;
     src = fetchurl {
-      url = "mirror://xorg/individual/app/xrandr-1.5.0.tar.bz2";
-      sha256 = "1kaih7rmzxr1vp5a5zzjhm5x7dn9mckya088sqqw026pskhx9ky1";
+      url = "mirror://xorg/individual/app/xrandr-1.5.1.tar.xz";
+      sha256 = "0ql75s1n3dm2m3g1ilb9l6hqh15r0v709bgghpwazy3jknpnvivv";
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
