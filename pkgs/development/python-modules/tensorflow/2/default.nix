@@ -112,6 +112,8 @@ let
 
       ./relax-dependencies.patch
 
+      ./dont_check_soname.patch
+
       # see https://github.com/tensorflow/tensorflow/issues/40688
       (fetchpatch {
         url = "https://github.com/tensorflow/tensorflow/commit/75ea0b31477d6ba9e990e296bbbd8ca4e7eebadf.patch";

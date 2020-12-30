@@ -1,0 +1,13 @@
+diff --git a/third_party/gpus/cuda_configure.bzl b/third_party/gpus/cuda_configure.bzl
+index 3ba34470b93..c6e54cdbecd 100644
+--- a/third_party/gpus/cuda_configure.bzl
++++ b/third_party/gpus/cuda_configure.bzl
+@@ -476,7 +476,7 @@ def _lib_path(lib, cpu_value, basedir, version, static):
+     return "%s/%s" % (basedir, file_name)
+ 
+ def _should_check_soname(version, static):
+-    return version and not static
++    return False
+ 
+ def _check_cuda_lib_params(lib, cpu_value, basedir, version, static = False):
+     return (
