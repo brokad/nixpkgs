@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, gfortran, ninja, cudatoolkit, libpthreadstubs, lapack, blas }:
+{ stdenv, fetchurl, cmake, gfortran, ninja, cudatoolkit, libpthreadstubs, lapack, blas, gpuTargets ? null }:
 
 with stdenv.lib;
 
@@ -18,6 +18,9 @@ in stdenv.mkDerivation {
   buildInputs = [ cudatoolkit libpthreadstubs lapack blas ];
 
   doCheck = false;
+
+  cmakeFlags = let gpuTargetFlag = concatStringsSep " " gpuTargets;
+               in lists.optional (! isNull gpuTargets) "-DGPU_TARGET=${gpuTargetFlag}";
 
   preConfigure = ''
     export CC=${cudatoolkit.cc}/bin/gcc CXX=${cudatoolkit.cc}/bin/g++
