@@ -38,6 +38,8 @@ let
 
   ghq = callPackage ./ghq { };
 
+  ghr = callPackage ./ghr { };
+
   git = appendToName "minimal" gitBase;
 
   git-absorb = callPackage ./git-absorb {
@@ -169,6 +171,8 @@ let
   git-trim = callPackage ./git-trim {
     inherit (darwin.apple_sdk.frameworks) Security;
   };
+
+  git-when-merged = callPackage ./git-when-merged { };
 
   git-workspace = callPackage ./git-workspace {
     inherit (darwin.apple_sdk.frameworks) Security;

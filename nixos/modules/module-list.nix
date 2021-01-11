@@ -66,6 +66,7 @@
   ./hardware/tuxedo-keyboard.nix
   ./hardware/usb-wwan.nix
   ./hardware/onlykey.nix
+  ./hardware/opentabletdriver.nix
   ./hardware/wooting.nix
   ./hardware/uinput.nix
   ./hardware/video/amdgpu.nix
@@ -81,6 +82,7 @@
   ./hardware/xpadneo.nix
   ./i18n/input-method/default.nix
   ./i18n/input-method/fcitx.nix
+  ./i18n/input-method/fcitx5.nix
   ./i18n/input-method/hime.nix
   ./i18n/input-method/ibus.nix
   ./i18n/input-method/nabi.nix
@@ -100,6 +102,7 @@
   ./misc/version.nix
   ./misc/nixops-autoluks.nix
   ./programs/adb.nix
+  ./programs/appgate-sdp.nix
   ./programs/atop.nix
   ./programs/autojump.nix
   ./programs/bandwhich.nix
@@ -141,6 +144,7 @@
   ./programs/light.nix
   ./programs/mosh.nix
   ./programs/mininet.nix
+  ./programs/msmtp.nix
   ./programs/mtr.nix
   ./programs/nano.nix
   ./programs/neovim.nix
@@ -224,6 +228,7 @@
   ./services/audio/icecast.nix
   ./services/audio/liquidsoap.nix
   ./services/audio/mpd.nix
+  ./services/audio/mpdscribble.nix
   ./services/audio/mopidy.nix
   ./services/audio/roon-server.nix
   ./services/audio/slimserver.nix
@@ -490,6 +495,7 @@
   ./services/misc/nix-ssh-serve.nix
   ./services/misc/novacomd.nix
   ./services/misc/nzbget.nix
+  ./services/misc/nzbhydra2.nix
   ./services/misc/octoprint.nix
   ./services/misc/osrm.nix
   ./services/misc/packagekit.nix
@@ -538,6 +544,7 @@
   ./services/monitoring/do-agent.nix
   ./services/monitoring/fusion-inventory.nix
   ./services/monitoring/grafana.nix
+  ./services/monitoring/grafana-image-renderer.nix
   ./services/monitoring/grafana-reporter.nix
   ./services/monitoring/graphite.nix
   ./services/monitoring/hdaps.nix
@@ -743,6 +750,7 @@
   ./services/networking/skydns.nix
   ./services/networking/shadowsocks.nix
   ./services/networking/shairport-sync.nix
+  ./services/networking/shellhub-agent.nix
   ./services/networking/shorewall.nix
   ./services/networking/shorewall6.nix
   ./services/networking/shout.nix
@@ -848,7 +856,7 @@
   ./services/torrent/peerflix.nix
   ./services/torrent/rtorrent.nix
   ./services/torrent/transmission.nix
-  ./services/ttys/agetty.nix
+  ./services/ttys/getty.nix
   ./services/ttys/gpm.nix
   ./services/ttys/kmscon.nix
   ./services/wayland/cage.nix

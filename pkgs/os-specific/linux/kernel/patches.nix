@@ -41,7 +41,8 @@
   hardened = let
     mkPatch = kernelVersion: src: {
       name = lib.removeSuffix ".patch" src.name;
-      patch = fetchurl src;
+      patch = fetchurl (lib.filterAttrs (k: v: k != "extra") src);
+      extra = src.extra;
     };
     patches = builtins.fromJSON (builtins.readFile ./hardened/patches.json);
   in lib.mapAttrs mkPatch patches;
@@ -103,5 +104,15 @@
   mac_nvme_t2 = rec {
     name = "mac_nvme_t2";
     patch = ./mac-nvme-t2.patch;
+  };
+
+  # https://lkml.org/lkml/2020/12/18/461
+  wireless_syntax_error = rec {
+    name = "wireless-syntax_error";
+    patch = fetchpatch {
+      name = name + ".patch";
+      url = "https://lkml.org/lkml/diff/2020/12/18/461/1";
+      sha256 = "11rnw9z7311crsx37sk68b71q51cni70lzf40ildqjnnn71m3q58";
+    };
   };
 }
