@@ -5144,6 +5144,8 @@ in
 
   jumpapp = callPackage ../tools/X11/jumpapp {};
 
+  jove = callPackage ../applications/editors/jove {};
+
   jucipp = callPackage ../applications/editors/jucipp { };
 
   jugglinglab = callPackage ../tools/misc/jugglinglab { };
@@ -6894,6 +6896,8 @@ in
     openssl = openssl_1_0_2;
   };
 
+  psw = callPackage ../tools/misc/psw { };
+
   pws = callPackage ../tools/misc/pws { };
 
   cntlm = callPackage ../tools/networking/cntlm { };
@@ -8382,6 +8386,8 @@ in
 
   whois = callPackage ../tools/networking/whois { };
 
+  wifish = callPackage ../tools/networking/wifish { };
+
   wifite2 = callPackage ../tools/networking/wifite2 { };
 
   wimboot = callPackage ../tools/misc/wimboot { };
@@ -8926,6 +8932,8 @@ in
   es = callPackage ../shells/es { };
 
   fish = callPackage ../shells/fish { };
+
+  wrapFish = callPackage ../shells/fish/wrapper.nix { };
 
   fishPlugins = recurseIntoAttrs (callPackage ../shells/fish/plugins { });
 
@@ -10050,7 +10058,17 @@ in
   llvm_6  = llvmPackages_6.llvm;
   llvm_5  = llvmPackages_5.llvm;
 
-  llvmPackages = recurseIntoAttrs llvmPackages_7;
+  llvmPackages = recurseIntoAttrs (with targetPlatform;
+    if isDarwin then
+      llvmPackages_7
+    else if isFreeBSD then
+      llvmPackages_7
+    else if isLinux then
+      llvmPackages_7
+    else if isWasm then
+      llvmPackages_8
+    else
+      llvmPackages_latest);
 
   llvmPackages_5 = callPackage ../development/compilers/llvm/5 {
     inherit (stdenvAdapters) overrideCC;
@@ -13343,6 +13361,10 @@ in
   glew110 = callPackage ../development/libraries/glew/1.10.nix {
     inherit (darwin.apple_sdk.frameworks) AGL OpenGL;
   };
+  glew-egl = glew.overrideAttrs (oldAttrs: {
+    pname = "glew-egl";
+    makeFlags = oldAttrs.makeFlags ++ [ "SYSTEM=linux-egl" ];
+  });
 
   glfw = glfw3;
   glfw2 = callPackage ../development/libraries/glfw/2.x.nix { };
@@ -21508,6 +21530,8 @@ in
 
   exercism = callPackage ../applications/misc/exercism { };
 
+  expenses = callPackage ../applications/misc/expenses { };
+
   go-libp2p-daemon = callPackage ../servers/go-libp2p-daemon { };
 
   go-motion = callPackage ../development/tools/go-motion { };
@@ -22635,6 +22659,8 @@ in
   dupd = callPackage ../tools/misc/dupd { };
 
   jdupes = callPackage ../tools/misc/jdupes { };
+
+  jed = callPackage ../applications/editors/jed { };
 
   jedit = callPackage ../applications/editors/jedit { };
 
@@ -24227,6 +24253,10 @@ in
   reaper = callPackage ../applications/audio/reaper { };
 
   recode = callPackage ../tools/text/recode { };
+
+  reddsaver = callPackage ../applications/misc/reddsaver {
+    inherit (darwin.apple_sdk.frameworks) Security;
+  };
 
   rednotebook = python3Packages.callPackage ../applications/editors/rednotebook { };
 
@@ -26346,6 +26376,7 @@ in
   megaglest = callPackage ../games/megaglest {};
 
   mindustry = callPackage ../games/mindustry { };
+  mindustry-wayland = callPackage ../games/mindustry { glew = glew-egl; };
 
   mindustry-server = callPackage ../games/mindustry {
     enableClient = false;
