@@ -1,4 +1,4 @@
-{ lib, fetchurl, cmake, gfortran, ninja, cudatoolkit, libpthreadstubs, lapack, blas, gpuTargets ? null }:
+{ lib, stdenv, fetchurl, cmake, gfortran, ninja, cudatoolkit, libpthreadstubs, lapack, blas, gpuTargets ? null }:
 
 with lib;
 
