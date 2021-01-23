@@ -1,5 +1,5 @@
 { stdenv, lib, fetchurl, fetchpatch, buildPackages
-, pkgconfig, intltool, ninja, meson
+, pkg-config, intltool, ninja, meson
 , file, flex, bison, expat, libdrm, xorg, wayland, wayland-protocols, openssl
 , llvmPackages, libffi, libomxil-bellagio, libva-minimal
 , libelf, libvdpau, python3Packages
@@ -26,7 +26,7 @@
   - libOSMesa is in $osmesa (~4 MB)
 */
 
-with stdenv.lib;
+with lib;
 
 let
   # Release calendar: https://www.mesa3d.org/release-calendar.html
@@ -129,10 +129,10 @@ stdenv.mkDerivation {
     ++ lib.optionals stdenv.isLinux [ libomxil-bellagio libva-minimal ]
     ++ lib.optional withValgrind valgrind-light;
 
-  depsBuildBuild = [ pkgconfig ];
+  depsBuildBuild = [ pkg-config ];
 
   nativeBuildInputs = [
-    pkgconfig meson ninja
+    pkg-config meson ninja
     intltool bison flex file
     python3Packages.python python3Packages.Mako
   ] ++ lib.optionals (elem "wayland" eglPlatforms) [
@@ -207,7 +207,7 @@ stdenv.mkDerivation {
     done
   '';
 
-  NIX_CFLAGS_COMPILE = stdenv.lib.optionalString stdenv.isDarwin "-fno-common";
+  NIX_CFLAGS_COMPILE = lib.optionalString stdenv.isDarwin "-fno-common";
 
   passthru = {
     inherit libdrm;

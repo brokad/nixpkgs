@@ -20,15 +20,15 @@ let
     categories = "Office;";
   };
 
-  runtimeLibs = stdenv.lib.makeLibraryPath [ gtk3 webkitgtk ];
+  runtimeLibs = lib.makeLibraryPath [ gtk3 webkitgtk ];
 in
 stdenv.mkDerivation rec {
   pname = "PortfolioPerformance";
-  version = "0.49.3";
+  version = "0.50.2";
 
   src = fetchurl {
     url = "https://github.com/buchen/portfolio/releases/download/${version}/PortfolioPerformance-${version}-linux.gtk.x86_64.tar.gz";
-    sha256 = "1j8d3bih2hs1c1a6pjqpmdlh2hbj76s00srl0f850d06jhldg3p6";
+    sha256 = "sha256-n5tLYrqqM0KUQrlJWZtKGClKONAz3EXBAlEqIrdPBpI=";
   };
 
   nativeBuildInputs = [

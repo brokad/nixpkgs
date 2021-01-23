@@ -147,6 +147,7 @@ in
   haproxy = handleTest ./haproxy.nix {};
   hardened = handleTest ./hardened.nix {};
   hedgedoc = handleTest ./hedgedoc.nix {};
+  herbstluftwm = handleTest ./herbstluftwm.nix {};
   installed-tests = pkgs.recurseIntoAttrs (handleTest ./installed-tests {});
   oci-containers = handleTestOn ["x86_64-linux"] ./oci-containers.nix {};
   # 9pnet_virtio used to mount /nix partition doesn't support
@@ -342,6 +343,7 @@ in
   sbt-extras = handleTest ./sbt-extras.nix {};
   scala = handleTest ./scala.nix {};
   sddm = handleTest ./sddm.nix {};
+  searx = handleTest ./searx.nix {};
   service-runner = handleTest ./service-runner.nix {};
   shadow = handleTest ./shadow.nix {};
   shadowsocks = handleTest ./shadowsocks {};
