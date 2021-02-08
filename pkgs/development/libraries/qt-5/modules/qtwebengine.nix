@@ -16,9 +16,10 @@
 , cups, darwin, openbsm, runCommand, xcbuild, writeScriptBin
 , ffmpeg_3 ? null
 , lib, stdenv, fetchpatch
+, qtCompatVersion
 }:
 
-with stdenv.lib;
+with lib;
 
 qtModule {
   name = "qtwebengine";
@@ -66,21 +67,31 @@ qtModule {
       sed -i -e '/libpci_loader.*Load/s!"\(libpci\.so\)!"${pciutils}/lib/\1!' \
         src/3rdparty/chromium/gpu/config/gpu_info_collector_linux.cc
     ''
-    + optionalString stdenv.isDarwin (''
+    + optionalString stdenv.isDarwin (
+    (if (lib.versionAtLeast qtCompatVersion "5.14") then ''
+      substituteInPlace src/buildtools/config/mac_osx.pri \
+        --replace 'QMAKE_CLANG_DIR = "/usr"' 'QMAKE_CLANG_DIR = "${stdenv.cc}"'
+    '' else ''
       substituteInPlace src/core/config/mac_osx.pri \
         --replace 'QMAKE_CLANG_DIR = "/usr"' 'QMAKE_CLANG_DIR = "${stdenv.cc}"'
-    ''
+    '')
      # Following is required to prevent a build error:
      # ninja: error: '/nix/store/z8z04p0ph48w22rqzx7ql67gy8cyvidi-SDKs/MacOSX10.12.sdk/usr/include/mach/exc.defs', needed by 'gen/third_party/crashpad/crashpad/util/mach/excUser.c', missing and no known rule to make it
     + ''
       substituteInPlace src/3rdparty/chromium/third_party/crashpad/crashpad/util/BUILD.gn \
         --replace '$sysroot/usr' "${darwin.xnu}"
     ''
-    + ''
     # Apple has some secret stuff they don't share with OpenBSM
+    + (if (lib.versionAtLeast qtCompatVersion "5.14") then ''
+    substituteInPlace src/3rdparty/chromium/base/mac/mach_port_rendezvous.cc \
+      --replace "audit_token_to_pid(request.trailer.msgh_audit)" "request.trailer.msgh_audit.val[5]"
+    substituteInPlace src/3rdparty/chromium/third_party/crashpad/crashpad/util/mach/mach_message.cc \
+      --replace "audit_token_to_pid(audit_trailer->msgh_audit)" "audit_trailer->msgh_audit.val[5]"
+    '' else ''
     substituteInPlace src/3rdparty/chromium/base/mac/mach_port_broker.mm \
       --replace "audit_token_to_pid(msg.trailer.msgh_audit)" "msg.trailer.msgh_audit.val[5]"
-
+    '')
+    + ''
     substituteInPlace src/3rdparty/chromium/sandbox/mac/BUILD.gn \
       --replace 'libs = [ "sandbox" ]' 'libs = [ "/usr/lib/libsandbox.1.dylib" ]'
     '');
@@ -88,7 +99,7 @@ qtModule {
   NIX_CFLAGS_COMPILE = lib.optionals stdenv.cc.isGNU [
     # with gcc8, -Wclass-memaccess became part of -Wall and this exceeds the logging limit
     "-Wno-class-memaccess"
-  ] ++ lib.optionals (stdenv.hostPlatform.platform.gcc.arch or "" == "sandybridge") [
+  ] ++ lib.optionals (stdenv.hostPlatform.gcc.arch or "" == "sandybridge") [
     # it fails when compiled with -march=sandybridge https://github.com/NixOS/nixpkgs/pull/59148#discussion_r276696940
     # TODO: investigate and fix properly
     "-march=westmere"

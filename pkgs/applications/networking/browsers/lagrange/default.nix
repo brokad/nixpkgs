@@ -1,9 +1,11 @@
 { stdenv
 , lib
 , fetchFromGitHub
+, nix-update-script
 , cmake
 , pkg-config
 , libunistring
+, mpg123
 , openssl
 , pcre
 , SDL2
@@ -12,19 +14,19 @@
 
 stdenv.mkDerivation rec {
   pname = "lagrange";
-  version = "1.0.3";
+  version = "1.1.1";
 
   src = fetchFromGitHub {
     owner = "skyjake";
     repo = "lagrange";
     rev = "v${version}";
-    sha256 = "1l9qcymjwg3wzbbi4hcyzfrxyqgz2xdy4ab3lr0zq38v025d794n";
+    sha256 = "0c7w4a19cwx3bkmbhc9c1wx0zmqd3a1grrj4ffifdic95wdihv7x";
     fetchSubmodules = true;
   };
 
   nativeBuildInputs = [ cmake pkg-config ];
 
-  buildInputs = [ libunistring openssl pcre SDL2 ]
+  buildInputs = [ libunistring mpg123 openssl pcre SDL2 ]
     ++ lib.optional stdenv.isDarwin AppKit;
 
   hardeningDisable = lib.optional (!stdenv.cc.isClang) "format";
@@ -33,6 +35,12 @@ stdenv.mkDerivation rec {
     mkdir -p $out/Applications
     mv Lagrange.app $out/Applications
   '' else null;
+
+  passthru = {
+    updateScript = nix-update-script {
+      attrPath = pname;
+    };
+  };
 
   meta = with lib; {
     description = "A Beautiful Gemini Client";

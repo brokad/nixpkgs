@@ -10,10 +10,10 @@ stdenv.mkDerivation rec {
   makeFlags = [
     "LIBRE_MK=${libre}/share/re/re.mk"
     "LIBRE_INC=${libre}/include/re"
-    ''PREFIX=$(out)''
+    "PREFIX=$(out)"
   ]
-  ++ lib.optional (stdenv.cc.cc != null) "SYSROOT_ALT=${stdenv.lib.getDev stdenv.cc.cc}"
-  ++ lib.optional (stdenv.cc.libc != null) "SYSROOT=${stdenv.lib.getDev stdenv.cc.libc}"
+  ++ lib.optional (stdenv.cc.cc != null) "SYSROOT_ALT=${lib.getDev stdenv.cc.cc}"
+  ++ lib.optional (stdenv.cc.libc != null) "SYSROOT=${lib.getDev stdenv.cc.libc}"
   ;
   meta = {
     description = " A library for real-time audio and video processing";

@@ -87,7 +87,7 @@ lib.mapAttrs (n: v: v // { shortName = n; }) {
 
   beerware = spdx {
     spdxId = "Beerware";
-    fullName = ''Beerware License'';
+    fullName = "Beerware License";
   };
 
   blueOak100 = spdx {
@@ -100,6 +100,11 @@ lib.mapAttrs (n: v: v // { shortName = n; }) {
     fullName = "BSD Zero Clause License";
   };
 
+  bsd1 = spdx {
+    spdxId = "BSD-1-Clause";
+    fullName = "BSD 1-Clause License";
+  };
+
   bsd2 = spdx {
     spdxId = "BSD-2-Clause";
     fullName = ''BSD 2-clause "Simplified" License'';
@@ -107,7 +112,7 @@ lib.mapAttrs (n: v: v // { shortName = n; }) {
 
   bsd2Patent = spdx {
     spdxId = "BSD-2-Clause-Patent";
-    fullName = ''BSD-2-Clause Plus Patent License'';
+    fullName = "BSD-2-Clause Plus Patent License";
   };
 
   bsd3 = spdx {

@@ -31,7 +31,7 @@
 , nss
 , pango
 , systemd
-, xdg_utils
+, xdg-utils
 , xorg
 }:
 
@@ -41,11 +41,11 @@ let
 
   pname = "slack";
 
-  x86_64-darwin-version = "4.11.1";
-  x86_64-darwin-sha256 = "0a5rq8zhgdckwxnyjv6nrgpnj682j1rd9yc4nwvsbvpzv15kmd35";
+  x86_64-darwin-version = "4.12.2";
+  x86_64-darwin-sha256 = "0qflv2glfy7d77zjgqi7qcjr53c9dni26gmqkg9vk2xijmmd3xy7";
 
-  x86_64-linux-version = "4.11.1";
-  x86_64-linux-sha256 = "1r43g3xnla5aq38l3mpba8jb1gx9m2b6pr84prsclz27nr0rfm6g";
+  x86_64-linux-version = "4.12.2";
+  x86_64-linux-sha256 = "sha256-G5uQI078N7AbhEJs6a/17Hoi5DSdwvYLM1T/ttrEw4s=";
 
   version = {
     x86_64-darwin = x86_64-darwin-version;
@@ -151,7 +151,7 @@ let
       rm $out/bin/slack
       makeWrapper $out/lib/slack/slack $out/bin/slack \
         --prefix XDG_DATA_DIRS : $GSETTINGS_SCHEMAS_PATH \
-        --prefix PATH : ${xdg_utils}/bin
+        --prefix PATH : ${xdg-utils}/bin
 
       # Fix the desktop link
       substituteInPlace $out/share/applications/slack.desktop \

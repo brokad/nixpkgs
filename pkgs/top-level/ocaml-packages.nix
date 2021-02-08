@@ -58,6 +58,8 @@ let
 
     batteries = callPackage ../development/ocaml-modules/batteries { };
 
+    bheap = callPackage ../development/ocaml-modules/bheap { };
+
     bigarray-compat = callPackage ../development/ocaml-modules/bigarray-compat { };
 
     bigarray-overlap = callPackage ../development/ocaml-modules/bigarray-overlap { };
@@ -128,6 +130,22 @@ let
 
     cairo2 = callPackage ../development/ocaml-modules/cairo2 { };
 
+    caqti = callPackage ../development/ocaml-modules/caqti { };
+
+    caqti-async = callPackage ../development/ocaml-modules/caqti/async.nix { };
+
+    caqti-driver-mariadb = callPackage ../development/ocaml-modules/caqti/driver-mariadb.nix { };
+
+    caqti-driver-postgresql = callPackage ../development/ocaml-modules/caqti/driver-postgresql.nix { };
+
+    caqti-driver-sqlite3 = callPackage ../development/ocaml-modules/caqti/driver-sqlite3.nix { };
+
+    caqti-dynload = callPackage ../development/ocaml-modules/caqti/dynload.nix { };
+
+    caqti-lwt = callPackage ../development/ocaml-modules/caqti/lwt.nix { };
+
+    caqti-type-calendar = callPackage ../development/ocaml-modules/caqti/type-calendar.nix { };
+
     cfstream = callPackage ../development/ocaml-modules/cfstream { };
 
     charInfo_width = callPackage ../development/ocaml-modules/charInfo_width { };
@@ -146,6 +164,8 @@ let
 
     cohttp-lwt-unix = callPackage ../development/ocaml-modules/cohttp/lwt-unix.nix { };
 
+    cohttp-mirage = callPackage ../development/ocaml-modules/cohttp/mirage.nix { };
+
     conduit = callPackage ../development/ocaml-modules/conduit { };
 
     conduit-async = callPackage ../development/ocaml-modules/conduit/async.nix { };
@@ -153,6 +173,8 @@ let
     conduit-lwt = callPackage ../development/ocaml-modules/conduit/lwt.nix { };
 
     conduit-lwt-unix = callPackage ../development/ocaml-modules/conduit/lwt-unix.nix { };
+
+    conduit-mirage = callPackage ../development/ocaml-modules/conduit/mirage.nix { };
 
     config-file = callPackage ../development/ocaml-modules/config-file { };
 
@@ -276,6 +298,8 @@ let
     easy-format = callPackage ../development/ocaml-modules/easy-format { };
 
     eigen = callPackage ../development/ocaml-modules/eigen { };
+
+    either = callPackage ../development/ocaml-modules/either { };
 
     elina = callPackage ../development/ocaml-modules/elina { };
 
@@ -482,6 +506,8 @@ let
 
     kafka = callPackage ../development/ocaml-modules/kafka { };
 
+    kafka_lwt = callPackage ../development/ocaml-modules/kafka/lwt.nix { };
+
     ke = callPackage ../development/ocaml-modules/ke { };
 
     lablgl = callPackage ../development/ocaml-modules/lablgl { };
@@ -555,6 +581,10 @@ let
     magic-mime = callPackage ../development/ocaml-modules/magic-mime { };
 
     magick = callPackage ../development/ocaml-modules/magick { };
+
+    mariadb = callPackage ../development/ocaml-modules/mariadb {
+      inherit (pkgs) mariadb;
+    };
 
     markup = callPackage ../development/ocaml-modules/markup { };
 
@@ -865,6 +895,10 @@ let
 
     posix-types = callPackage ../development/ocaml-modules/posix/types.nix { };
 
+    postgresql = callPackage ../development/ocaml-modules/postgresql {
+      inherit (pkgs) postgresql;
+    };
+
     ppx_bitstring = callPackage ../development/ocaml-modules/bitstring/ppx.nix { };
 
     ppxfind = callPackage ../development/ocaml-modules/ppxfind { };
@@ -878,6 +912,8 @@ let
     ptime = callPackage ../development/ocaml-modules/ptime { };
 
     resource-pooling = callPackage ../development/ocaml-modules/resource-pooling { };
+
+    repr = callPackage ../development/ocaml-modules/repr { };
 
     result = callPackage ../development/ocaml-modules/ocaml-result { };
 
@@ -902,6 +938,8 @@ let
     ulex = callPackage ../development/ocaml-modules/ulex { };
 
     tls = callPackage ../development/ocaml-modules/tls { };
+
+    tls-mirage = callPackage ../development/ocaml-modules/tls/mirage.nix { };
 
     torch = callPackage ../development/ocaml-modules/torch {
       inherit (pkgs.python3Packages) pytorch;
@@ -939,14 +977,11 @@ let
 
     ppx_blob = callPackage ../development/ocaml-modules/ppx_blob { };
 
-    ppx_cstruct = callPackage ../development/ocaml-modules/cstruct/ppx.nix {};
+    ppx_cstruct = callPackage ../development/ocaml-modules/cstruct/ppx.nix { };
 
     ppx_derivers = callPackage ../development/ocaml-modules/ppx_derivers {};
 
-    ppx_deriving =
-      if lib.versionAtLeast ocaml.version "4.02"
-      then callPackage ../development/ocaml-modules/ppx_deriving {}
-      else null;
+    ppx_deriving = callPackage ../development/ocaml-modules/ppx_deriving {};
 
     ppx_deriving_protobuf = callPackage ../development/ocaml-modules/ppx_deriving_protobuf {};
 
@@ -960,6 +995,8 @@ let
 
     ppx_irmin = callPackage ../development/ocaml-modules/irmin/ppx.nix {
     };
+
+    ppx_repr = callPackage ../development/ocaml-modules/repr/ppx.nix { };
 
     ppx_tools =
       if lib.versionAtLeast ocaml.version "4.02"
@@ -975,6 +1012,8 @@ let
     process = callPackage ../development/ocaml-modules/process { };
 
     prof_spacetime = callPackage ../development/ocaml-modules/prof_spacetime { };
+
+    progress = callPackage ../development/ocaml-modules/progress { };
 
     ptmap = callPackage ../development/ocaml-modules/ptmap { };
 
@@ -1016,6 +1055,8 @@ let
 
     sedlex_2 = callPackage ../development/ocaml-modules/sedlex/2.nix { };
 
+    semaphore-compat = callPackage ../development/ocaml-modules/semaphore-compat { };
+
     sodium = callPackage ../development/ocaml-modules/sodium { };
 
     spelll = callPackage ../development/ocaml-modules/spelll { };
@@ -1035,6 +1076,8 @@ let
     stringext = callPackage ../development/ocaml-modules/stringext { };
 
     tcslib = callPackage ../development/ocaml-modules/tcslib { };
+
+    terminal_size = callPackage ../development/ocaml-modules/terminal_size { };
 
     toml = callPackage ../development/ocaml-modules/toml { };
 
@@ -1071,6 +1114,8 @@ let
 
     variantslib_p4 = callPackage ../development/ocaml-modules/variantslib { };
 
+    vchan = callPackage ../development/ocaml-modules/vchan { };
+
     vg = callPackage ../development/ocaml-modules/vg { };
 
     visitors = callPackage ../development/ocaml-modules/visitors { };
@@ -1090,6 +1135,12 @@ let
     wtf8 = callPackage ../development/ocaml-modules/wtf8 { };
 
     x509 = callPackage ../development/ocaml-modules/x509 { };
+
+    xenstore = callPackage ../development/ocaml-modules/xenstore { };
+
+    xenstore_transport = callPackage ../development/ocaml-modules/xenstore_transport { };
+
+    xenstore-tool = callPackage ../development/ocaml-modules/xenstore-tool { };
 
     xmlm = callPackage ../development/ocaml-modules/xmlm { };
 

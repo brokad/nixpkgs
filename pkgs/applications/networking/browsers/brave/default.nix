@@ -38,7 +38,7 @@
 , udev
 , xorg
 , zlib
-, xdg_utils
+, xdg-utils
 , wrapGAppsHook
 }:
 
@@ -79,7 +79,7 @@ rpath = lib.makeLibraryPath [
   nss
   pango
   udev
-  xdg_utils
+  xdg-utils
   xorg.libxcb
   zlib
 ];
@@ -88,11 +88,11 @@ in
 
 stdenv.mkDerivation rec {
   pname = "brave";
-  version = "1.19.86";
+  version = "1.19.88";
 
   src = fetchurl {
     url = "https://github.com/brave/brave-browser/releases/download/v${version}/brave-browser_${version}_amd64.deb";
-    sha256 = "fnkxfhuYTDKPrXSNlG0SlgDls4jnV146wrhxg1crR9c=";
+    sha256 = "jySedvm9V3O4kri1PgoqC0OsC1gvB0Nwx8leoUZnHK0=";
   };
 
   dontConfigure = true;
@@ -144,8 +144,8 @@ stdenv.mkDerivation rec {
       done
 
       # Replace xdg-settings and xdg-mime
-      ln -sf ${xdg_utils}/bin/xdg-settings $out/opt/brave.com/brave/xdg-settings
-      ln -sf ${xdg_utils}/bin/xdg-mime $out/opt/brave.com/brave/xdg-mime
+      ln -sf ${xdg-utils}/bin/xdg-settings $out/opt/brave.com/brave/xdg-settings
+      ln -sf ${xdg-utils}/bin/xdg-mime $out/opt/brave.com/brave/xdg-mime
   '';
 
   installCheckPhase = ''

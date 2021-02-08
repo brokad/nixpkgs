@@ -2,7 +2,7 @@
 # Do not edit!
 
 {
-  version = "2021.1.4";
+  version = "2021.2.1";
   components = {
     "abode" = ps: with ps; [ abodepy ];
     "accuweather" = ps: with ps; [ accuweather ];
@@ -16,6 +16,7 @@
     "agent_dvr" = ps: with ps; [ agent-py ];
     "air_quality" = ps: with ps; [ ];
     "airly" = ps: with ps; [ airly ];
+    "airnow" = ps: with ps; [ ]; # missing inputs: pyairnow
     "airvisual" = ps: with ps; [ pyairvisual ];
     "aladdin_connect" = ps: with ps; [ ]; # missing inputs: aladdin_connect
     "alarm_control_panel" = ps: with ps; [ ];
@@ -27,7 +28,7 @@
     "amazon_polly" = ps: with ps; [ boto3 ];
     "ambiclimate" = ps: with ps; [ aiohttp-cors ambiclimate ];
     "ambient_station" = ps: with ps; [ ]; # missing inputs: aioambient
-    "amcrest" = ps: with ps; [ ha-ffmpeg ]; # missing inputs: amcrest
+    "amcrest" = ps: with ps; [ amcrest ha-ffmpeg ];
     "ampio" = ps: with ps; [ ]; # missing inputs: asmog
     "android_ip_webcam" = ps: with ps; [ ]; # missing inputs: pydroid-ipcam
     "androidtv" = ps: with ps; [ adb-shell androidtv pure-python-adb ];
@@ -61,7 +62,7 @@
     "auth" = ps: with ps; [ aiohttp-cors ];
     "automation" = ps: with ps; [ aiohttp-cors ];
     "avea" = ps: with ps; [ avea ];
-    "avion" = ps: with ps; [ ]; # missing inputs: avion
+    "avion" = ps: with ps; [ avion ];
     "awair" = ps: with ps; [ ]; # missing inputs: python_awair
     "aws" = ps: with ps; [ aiobotocore ];
     "axis" = ps: with ps; [ aiohttp-cors axis paho-mqtt ];
@@ -96,7 +97,7 @@
     "braviatv" = ps: with ps; [ bravia-tv ];
     "broadlink" = ps: with ps; [ broadlink ];
     "brother" = ps: with ps; [ brother ];
-    "brottsplatskartan" = ps: with ps; [ ]; # missing inputs: brottsplatskartan
+    "brottsplatskartan" = ps: with ps; [ brottsplatskartan ];
     "browser" = ps: with ps; [ ];
     "brunt" = ps: with ps; [ ]; # missing inputs: brunt
     "bsblan" = ps: with ps; [ bsblan ];
@@ -107,7 +108,7 @@
     "calendar" = ps: with ps; [ aiohttp-cors ];
     "camera" = ps: with ps; [ aiohttp-cors ];
     "canary" = ps: with ps; [ ha-ffmpeg ]; # missing inputs: py-canary
-    "cast" = ps: with ps; [ aiohttp-cors hass-nabucasa mutagen plexapi plexauth plexwebsocket PyChromecast pysonos zeroconf ];
+    "cast" = ps: with ps; [ aiohttp-cors hass-nabucasa mutagen plexapi plexauth plexwebsocket PyChromecast zeroconf ];
     "cert_expiry" = ps: with ps; [ ];
     "channels" = ps: with ps; [ ]; # missing inputs: pychannels
     "circuit" = ps: with ps; [ ]; # missing inputs: circuit-webhook
@@ -121,7 +122,7 @@
     "clicksend_tts" = ps: with ps; [ ];
     "climate" = ps: with ps; [ ];
     "cloud" = ps: with ps; [ aiohttp-cors hass-nabucasa ];
-    "cloudflare" = ps: with ps; [ ]; # missing inputs: pycfdns
+    "cloudflare" = ps: with ps; [ pycfdns ];
     "cmus" = ps: with ps; [ ]; # missing inputs: pycmus
     "co2signal" = ps: with ps; [ ]; # missing inputs: co2signal
     "coinbase" = ps: with ps; [ ]; # missing inputs: coinbase
@@ -153,7 +154,7 @@
     "deconz" = ps: with ps; [ ]; # missing inputs: pydeconz
     "decora" = ps: with ps; [ bluepy ]; # missing inputs: decora
     "decora_wifi" = ps: with ps; [ ]; # missing inputs: decora_wifi
-    "default_config" = ps: with ps; [ pynacl aiohttp-cors defusedxml distro emoji hass-nabucasa netdisco pillow sqlalchemy zeroconf ]; # missing inputs: home-assistant-frontend
+    "default_config" = ps: with ps; [ pynacl aiohttp-cors defusedxml distro emoji hass-nabucasa netdisco pillow scapy sqlalchemy zeroconf ];
     "delijn" = ps: with ps; [ ]; # missing inputs: pydelijn
     "deluge" = ps: with ps; [ deluge-client ];
     "demo" = ps: with ps; [ aiohttp-cors ];
@@ -166,6 +167,7 @@
     "device_tracker" = ps: with ps; [ ];
     "devolo_home_control" = ps: with ps; [ aiohttp-cors devolo-home-control-api zeroconf ];
     "dexcom" = ps: with ps; [ pydexcom ];
+    "dhcp" = ps: with ps; [ scapy ];
     "dht" = ps: with ps; [ ]; # missing inputs: Adafruit-DHT
     "dialogflow" = ps: with ps; [ aiohttp-cors ];
     "digital_ocean" = ps: with ps; [ digital-ocean ];
@@ -194,7 +196,7 @@
     "dweet" = ps: with ps; [ ]; # missing inputs: dweepy
     "dynalite" = ps: with ps; [ ]; # missing inputs: dynalite_devices
     "dyson" = ps: with ps; [ aiohttp-cors zeroconf ]; # missing inputs: libpurecool
-    "eafm" = ps: with ps; [ ]; # missing inputs: aioeafm
+    "eafm" = ps: with ps; [ aioeafm ];
     "ebox" = ps: with ps; [ ]; # missing inputs: pyebox
     "ebusd" = ps: with ps; [ ]; # missing inputs: ebusdpy
     "ecoal_boiler" = ps: with ps; [ ]; # missing inputs: ecoaliface
@@ -202,7 +204,7 @@
     "econet" = ps: with ps; [ ]; # missing inputs: pyeconet
     "ecovacs" = ps: with ps; [ ]; # missing inputs: sucks
     "eddystone_temperature" = ps: with ps; [ construct ]; # missing inputs: beacontools[scan]
-    "edimax" = ps: with ps; [ ]; # missing inputs: pyedimax
+    "edimax" = ps: with ps; [ pyedimax ];
     "edl21" = ps: with ps; [ ]; # missing inputs: pysml
     "ee_brightbox" = ps: with ps; [ ]; # missing inputs: eebrightbox
     "efergy" = ps: with ps; [ ];
@@ -242,7 +244,7 @@
     "familyhub" = ps: with ps; [ ]; # missing inputs: python-family-hub-local
     "fan" = ps: with ps; [ ];
     "fastdotcom" = ps: with ps; [ ]; # missing inputs: fastdotcom
-    "feedreader" = ps: with ps; [ ]; # missing inputs: feedparser-homeassistant
+    "feedreader" = ps: with ps; [ feedparser ];
     "ffmpeg" = ps: with ps; [ ha-ffmpeg ];
     "ffmpeg_motion" = ps: with ps; [ ha-ffmpeg ];
     "ffmpeg_noise" = ps: with ps; [ ha-ffmpeg ];
@@ -270,7 +272,7 @@
     "folder_watcher" = ps: with ps; [ watchdog ];
     "foobot" = ps: with ps; [ ]; # missing inputs: foobot_async
     "forked_daapd" = ps: with ps; [ ]; # missing inputs: pyforked-daapd pylibrespot-java
-    "fortios" = ps: with ps; [ ]; # missing inputs: fortiosapi
+    "fortios" = ps: with ps; [ fortiosapi ];
     "foscam" = ps: with ps; [ ]; # missing inputs: libpyfoscam
     "foursquare" = ps: with ps; [ aiohttp-cors ];
     "free_mobile" = ps: with ps; [ ]; # missing inputs: freesms
@@ -281,7 +283,7 @@
     "fritzbox_callmonitor" = ps: with ps; [ fritzconnection ];
     "fritzbox_netmonitor" = ps: with ps; [ fritzconnection ];
     "fronius" = ps: with ps; [ ]; # missing inputs: pyfronius
-    "frontend" = ps: with ps; [ aiohttp-cors pillow ]; # missing inputs: home-assistant-frontend
+    "frontend" = ps: with ps; [ aiohttp-cors pillow ];
     "frontier_silicon" = ps: with ps; [ ]; # missing inputs: afsapi
     "futurenow" = ps: with ps; [ pyfnip ];
     "garadget" = ps: with ps; [ ];
@@ -292,7 +294,7 @@
     "generic" = ps: with ps; [ ];
     "generic_thermostat" = ps: with ps; [ ];
     "geniushub" = ps: with ps; [ ]; # missing inputs: geniushub-client
-    "geo_json_events" = ps: with ps; [ ]; # missing inputs: geojson_client
+    "geo_json_events" = ps: with ps; [ geojson-client ];
     "geo_location" = ps: with ps; [ ];
     "geo_rss_events" = ps: with ps; [ ]; # missing inputs: georss_generic_client
     "geofency" = ps: with ps; [ aiohttp-cors ];
@@ -333,7 +335,7 @@
     "hangouts" = ps: with ps; [ ]; # missing inputs: hangups
     "harman_kardon_avr" = ps: with ps; [ ]; # missing inputs: hkavr
     "harmony" = ps: with ps; [ aioharmony ];
-    "hassio" = ps: with ps; [ aiohttp-cors pillow ]; # missing inputs: home-assistant-frontend
+    "hassio" = ps: with ps; [ aiohttp-cors pillow ];
     "haveibeenpwned" = ps: with ps; [ ];
     "hddtemp" = ps: with ps; [ ];
     "hdmi_cec" = ps: with ps; [ ]; # missing inputs: pyCEC
@@ -364,6 +366,7 @@
     "huawei_lte" = ps: with ps; [ getmac stringcase url-normalize ]; # missing inputs: huawei-lte-api
     "huawei_router" = ps: with ps; [ ];
     "hue" = ps: with ps; [ aiohue ];
+    "huisbaasje" = ps: with ps; [ ]; # missing inputs: huisbaasje-client
     "humidifier" = ps: with ps; [ ];
     "hunterdouglas_powerview" = ps: with ps; [ ]; # missing inputs: aiopvapi
     "hvv_departures" = ps: with ps; [ ]; # missing inputs: pygti
@@ -448,7 +451,7 @@
     "local_ip" = ps: with ps; [ ];
     "locative" = ps: with ps; [ aiohttp-cors ];
     "lock" = ps: with ps; [ ];
-    "logbook" = ps: with ps; [ aiohttp-cors pillow sqlalchemy ]; # missing inputs: home-assistant-frontend
+    "logbook" = ps: with ps; [ aiohttp-cors pillow sqlalchemy ];
     "logentries" = ps: with ps; [ ];
     "logger" = ps: with ps; [ ];
     "logi_circle" = ps: with ps; [ aiohttp-cors ha-ffmpeg ]; # missing inputs: logi_circle
@@ -460,7 +463,7 @@
     "luftdaten" = ps: with ps; [ luftdaten ];
     "lupusec" = ps: with ps; [ ]; # missing inputs: lupupy
     "lutron" = ps: with ps; [ pylutron ];
-    "lutron_caseta" = ps: with ps; [ ]; # missing inputs: pylutron-caseta
+    "lutron_caseta" = ps: with ps; [ ]; # missing inputs: aiolip pylutron-caseta
     "lw12wifi" = ps: with ps; [ ]; # missing inputs: lw12
     "lyft" = ps: with ps; [ ]; # missing inputs: lyft_rides
     "magicseaweed" = ps: with ps; [ ]; # missing inputs: magicseaweed
@@ -468,7 +471,7 @@
     "mailgun" = ps: with ps; [ aiohttp-cors ]; # missing inputs: pymailgunner
     "manual" = ps: with ps; [ ];
     "manual_mqtt" = ps: with ps; [ aiohttp-cors paho-mqtt ];
-    "map" = ps: with ps; [ aiohttp-cors pillow ]; # missing inputs: home-assistant-frontend
+    "map" = ps: with ps; [ aiohttp-cors pillow ];
     "marytts" = ps: with ps; [ ]; # missing inputs: speak2mary
     "mastodon" = ps: with ps; [ ]; # missing inputs: Mastodon.py
     "matrix" = ps: with ps; [ matrix-client ];
@@ -572,7 +575,8 @@
     "ohmconnect" = ps: with ps; [ defusedxml ];
     "ombi" = ps: with ps; [ ]; # missing inputs: pyombi
     "omnilogic" = ps: with ps; [ ]; # missing inputs: omnilogic
-    "onboarding" = ps: with ps; [ aiohttp-cors pillow ]; # missing inputs: home-assistant-frontend
+    "onboarding" = ps: with ps; [ aiohttp-cors pillow ];
+    "ondilo_ico" = ps: with ps; [ aiohttp-cors ]; # missing inputs: ondilo
     "onewire" = ps: with ps; [ ]; # missing inputs: pi1wire pyownet
     "onkyo" = ps: with ps; [ onkyo-eiscp ];
     "onvif" = ps: with ps; [ ha-ffmpeg zeep ]; # missing inputs: WSDiscovery onvif-zeep-async
@@ -588,7 +592,7 @@
     "opensensemap" = ps: with ps; [ opensensemap-api ];
     "opensky" = ps: with ps; [ ];
     "opentherm_gw" = ps: with ps; [ ]; # missing inputs: pyotgw
-    "openuv" = ps: with ps; [ ]; # missing inputs: pyopenuv
+    "openuv" = ps: with ps; [ pyopenuv ];
     "openweathermap" = ps: with ps; [ pyowm ];
     "opnsense" = ps: with ps; [ pyopnsense ];
     "opple" = ps: with ps; [ ]; # missing inputs: pyoppleio
@@ -599,12 +603,12 @@
     "otp" = ps: with ps; [ pyotp ];
     "ovo_energy" = ps: with ps; [ ]; # missing inputs: ovoenergy
     "owntracks" = ps: with ps; [ pynacl aiohttp-cors hass-nabucasa paho-mqtt ];
-    "ozw" = ps: with ps; [ aiohttp-cors paho-mqtt ]; # missing inputs: python-openzwave-mqtt[mqtt-client]
+    "ozw" = ps: with ps; [ aiohttp-cors homeassistant-pyozw paho-mqtt pydispatcher python-openzwave-mqtt ];
     "panasonic_bluray" = ps: with ps; [ ]; # missing inputs: panacotta
     "panasonic_viera" = ps: with ps; [ ]; # missing inputs: panasonic_viera
     "pandora" = ps: with ps; [ pexpect ];
-    "panel_custom" = ps: with ps; [ aiohttp-cors pillow ]; # missing inputs: home-assistant-frontend
-    "panel_iframe" = ps: with ps; [ aiohttp-cors pillow ]; # missing inputs: home-assistant-frontend
+    "panel_custom" = ps: with ps; [ aiohttp-cors pillow ];
+    "panel_iframe" = ps: with ps; [ aiohttp-cors pillow ];
     "pcal9535a" = ps: with ps; [ ]; # missing inputs: pcal9535a
     "pencom" = ps: with ps; [ ]; # missing inputs: pencompy
     "persistent_notification" = ps: with ps; [ ];
@@ -620,8 +624,8 @@
     "pjlink" = ps: with ps; [ ]; # missing inputs: pypjlink2
     "plaato" = ps: with ps; [ aiohttp-cors ];
     "plant" = ps: with ps; [ sqlalchemy ];
-    "plex" = ps: with ps; [ aiohttp-cors plexapi plexauth plexwebsocket pysonos ];
-    "plugwise" = ps: with ps; [ ]; # missing inputs: plugwise
+    "plex" = ps: with ps; [ aiohttp-cors plexapi plexauth plexwebsocket ];
+    "plugwise" = ps: with ps; [ plugwise ];
     "plum_lightpad" = ps: with ps; [ ]; # missing inputs: plumlightpad
     "pocketcasts" = ps: with ps; [ ]; # missing inputs: pycketcasts
     "point" = ps: with ps; [ aiohttp-cors ]; # missing inputs: pypoint
@@ -636,7 +640,6 @@
     "proxmoxve" = ps: with ps; [ ]; # missing inputs: proxmoxer
     "proxy" = ps: with ps; [ pillow ];
     "ps4" = ps: with ps; [ ]; # missing inputs: pyps4-2ndscreen
-    "ptvsd" = ps: with ps; [ ]; # missing inputs: ptvsd
     "pulseaudio_loopback" = ps: with ps; [ pulsectl ];
     "push" = ps: with ps; [ aiohttp-cors ];
     "pushbullet" = ps: with ps; [ pushbullet ];
@@ -659,7 +662,7 @@
     "rainbird" = ps: with ps; [ ]; # missing inputs: pyrainbird
     "raincloud" = ps: with ps; [ ]; # missing inputs: raincloudy
     "rainforest_eagle" = ps: with ps; [ ]; # missing inputs: eagle200_reader uEagle
-    "rainmachine" = ps: with ps; [ ]; # missing inputs: regenmaschine
+    "rainmachine" = ps: with ps; [ regenmaschine ];
     "random" = ps: with ps; [ ];
     "raspihats" = ps: with ps; [ smbus-cffi ]; # missing inputs: raspihats
     "raspyrfm" = ps: with ps; [ ]; # missing inputs: raspyrfm-client
@@ -698,7 +701,7 @@
     "russound_rio" = ps: with ps; [ ]; # missing inputs: russound_rio
     "russound_rnet" = ps: with ps; [ ]; # missing inputs: russound
     "sabnzbd" = ps: with ps; [ aiohttp-cors netdisco zeroconf ]; # missing inputs: pysabnzbd
-    "safe_mode" = ps: with ps; [ aiohttp-cors hass-nabucasa pillow ]; # missing inputs: home-assistant-frontend
+    "safe_mode" = ps: with ps; [ aiohttp-cors hass-nabucasa pillow ];
     "saj" = ps: with ps; [ ]; # missing inputs: pysaj
     "samsungtv" = ps: with ps; [ samsungctl samsungtvws ];
     "satel_integra" = ps: with ps; [ ]; # missing inputs: satel_integra
@@ -741,7 +744,7 @@
     "slack" = ps: with ps; [ ]; # missing inputs: slackclient
     "sleepiq" = ps: with ps; [ ]; # missing inputs: sleepyq
     "slide" = ps: with ps; [ ]; # missing inputs: goslide-api
-    "sma" = ps: with ps; [ ]; # missing inputs: pysma
+    "sma" = ps: with ps; [ pysma ];
     "smappee" = ps: with ps; [ aiohttp-cors ]; # missing inputs: pysmappee
     "smart_meter_texas" = ps: with ps; [ ]; # missing inputs: smart-meter-texas
     "smarthab" = ps: with ps; [ ]; # missing inputs: smarthab
@@ -758,13 +761,13 @@
     "solaredge" = ps: with ps; [ stringcase ]; # missing inputs: solaredge
     "solaredge_local" = ps: with ps; [ ]; # missing inputs: solaredge-local
     "solarlog" = ps: with ps; [ ]; # missing inputs: sunwatcher
-    "solax" = ps: with ps; [ ]; # missing inputs: solax
+    "solax" = ps: with ps; [ solax ];
     "soma" = ps: with ps; [ pysoma ];
     "somfy" = ps: with ps; [ aiohttp-cors ]; # missing inputs: pymfy
     "somfy_mylink" = ps: with ps; [ ]; # missing inputs: somfy-mylink-synergy
     "sonarr" = ps: with ps; [ ]; # missing inputs: sonarr
     "songpal" = ps: with ps; [ ]; # missing inputs: python-songpal
-    "sonos" = ps: with ps; [ pysonos ];
+    "sonos" = ps: with ps; [ aiohttp-cors plexapi plexauth plexwebsocket pysonos ];
     "sony_projector" = ps: with ps; [ ]; # missing inputs: pysdcp
     "soundtouch" = ps: with ps; [ aiohttp-cors libsoundtouch zeroconf ];
     "spaceapi" = ps: with ps; [ aiohttp-cors ];
@@ -885,7 +888,7 @@
     "uptime" = ps: with ps; [ ];
     "uptimerobot" = ps: with ps; [ ]; # missing inputs: pyuptimerobot
     "uscis" = ps: with ps; [ ]; # missing inputs: uscisstatus
-    "usgs_earthquakes_feed" = ps: with ps; [ ]; # missing inputs: geojson_client
+    "usgs_earthquakes_feed" = ps: with ps; [ geojson-client ];
     "utility_meter" = ps: with ps; [ ];
     "uvc" = ps: with ps; [ uvcclient ];
     "vacuum" = ps: with ps; [ ];
@@ -941,7 +944,7 @@
     "x10" = ps: with ps; [ ];
     "xbee" = ps: with ps; [ ]; # missing inputs: xbee-helper
     "xbox" = ps: with ps; [ aiohttp-cors ]; # missing inputs: xbox-webapi
-    "xbox_live" = ps: with ps; [ ]; # missing inputs: xboxapi
+    "xbox_live" = ps: with ps; [ xboxapi ];
     "xeoma" = ps: with ps; [ pyxeoma ];
     "xfinity" = ps: with ps; [ ]; # missing inputs: xfinity-gateway
     "xiaomi" = ps: with ps; [ ha-ffmpeg ];
@@ -970,6 +973,7 @@
     "zodiac" = ps: with ps; [ ];
     "zone" = ps: with ps; [ ];
     "zoneminder" = ps: with ps; [ zm-py ];
-    "zwave" = ps: with ps; [ homeassistant-pyozw pydispatcher ];
+    "zwave" = ps: with ps; [ aiohttp-cors homeassistant-pyozw paho-mqtt pydispatcher python-openzwave-mqtt ];
+    "zwave_js" = ps: with ps; [ aiohttp-cors ]; # missing inputs: zwave-js-server-python
   };
 }

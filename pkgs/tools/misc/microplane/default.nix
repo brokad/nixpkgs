@@ -1,14 +1,14 @@
-{ lib, stdenv, buildGoPackage, fetchFromGitHub }:
+{ lib, buildGoPackage, fetchFromGitHub }:
 
 buildGoPackage rec {
   pname = "microplane";
-  version = "0.0.25";
+  version = "0.0.26";
 
   src = fetchFromGitHub {
     owner = "Clever";
     repo = "microplane";
     rev = "v${version}";
-    sha256 = "0vynkv3d70q8d079kgdmwbavyyrjssqnd223dl1rikyy7sd5sli8";
+    sha256 = "0dba8cz13ljcsfibcwycd9vb759fzlllh2bv31vgbs2pjgcinzvm";
   };
 
   goPackagePath = "github.com/Clever/microplane";

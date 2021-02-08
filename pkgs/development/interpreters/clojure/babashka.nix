@@ -1,6 +1,6 @@
-{ stdenv, fetchurl, graalvm11-ce, glibcLocales }:
+{ lib, stdenv, fetchurl, graalvm11-ce, glibcLocales }:
 
-with stdenv.lib;
+with lib;
 stdenv.mkDerivation rec {
   pname = "babashka";
   version = "0.2.3";
@@ -25,13 +25,13 @@ stdenv.mkDerivation rec {
     native-image \
       -jar ${src} \
       -H:Name=bb \
+      ${optionalString stdenv.isDarwin ''-H:-CheckToolchain''} \
       -H:+ReportExceptionStackTraces \
       -J-Dclojure.spec.skip-macros=true \
       -J-Dclojure.compiler.direct-linking=true \
       "-H:IncludeResources=BABASHKA_VERSION" \
       "-H:IncludeResources=SCI_VERSION" \
       -H:ReflectionConfigurationFiles=${reflectionJson} \
-      --initialize-at-run-time=java.lang.Math\$RandomNumberGeneratorHolder \
       --initialize-at-build-time \
       -H:Log=registerResource: \
       -H:EnableURLProtocols=http,https \
@@ -50,7 +50,7 @@ stdenv.mkDerivation rec {
     cp bb $out/bin/bb
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "A Clojure babushka for the grey areas of Bash";
     longDescription = ''
       The main idea behind babashka is to leverage Clojure in places where you

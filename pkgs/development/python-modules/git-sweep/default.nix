@@ -1,4 +1,4 @@
-{ lib, stdenv
+{ lib
 , buildPythonPackage
 , fetchPypi
 , GitPython
@@ -14,6 +14,11 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ GitPython ];
+
+  # no tests
+  doCheck = false;
+
+  pythonImportsCheck = [ "gitsweep" ];
 
   meta = with lib; {
     description = "A command-line tool that helps you clean up Git branches";

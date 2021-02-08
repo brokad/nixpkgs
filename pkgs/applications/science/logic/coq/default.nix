@@ -13,7 +13,8 @@
 , csdp ? null
 , version, coq-version ? null,
 }@args:
-let lib = import ../../../../build-support/coq/extra-lib.nix {inherit (stdenv) lib;}; in
+let lib' = lib; in
+let lib = import ../../../../build-support/coq/extra-lib.nix {lib = lib';}; in
 with builtins; with lib;
 let
   release = {
@@ -40,11 +41,11 @@ let
    "8.12.0".sha256     = "18dc7k0piv6v064zgdadpw6mkkxk7j663hb3svgj5236fihjr0cz";
    "8.12.1".sha256     = "1rkcyjjrzcqw9xk93hsq0vvji4f8r5iq0f739mghk60bghkpnb7q";
    "8.12.2".sha256     = "18gscfm039pqhq4msq01nraig5dm9ab98bjca94zldf8jvdv0x2n";
-   "8.13+beta1".sha256 = "1v4a6dpj41flspa4ihcr7m5ahqz10kbn62fmrldmv7gzq6jsyfyq";
+   "8.13.0".sha256     = "0sjbqmz6qcvnz0hv87xha80qbhvmmyd675wyc5z4rgr34j2l1ymd";
   };
   releaseRev = v: "V${v}";
   fetched = import ../../../../build-support/coq/meta-fetch/default.nix
-    { inherit stdenv fetchzip; }
+    { inherit lib stdenv fetchzip; }
     { inherit release releaseRev; location = { owner = "coq"; repo = "coq";}; }
     args.version;
   version = fetched.version;

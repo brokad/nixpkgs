@@ -610,12 +610,12 @@ self: super: builtins.intersectAttrs super {
 
   git-annex = with pkgs;
     if (!stdenv.isLinux) then
-      let path = stdenv.lib.makeBinPath [ coreutils ];
+      let path = lib.makeBinPath [ coreutils ];
       in overrideCabal (addBuildTool super.git-annex makeWrapper) (_drv: {
         # This is an instance of https://github.com/NixOS/nix/pull/1085
         # Fails with:
         #   gpg: can't connect to the agent: File name too long
-        postPatch = stdenv.lib.optionalString stdenv.isDarwin ''
+        postPatch = lib.optionalString stdenv.isDarwin ''
           substituteInPlace Test.hs \
             --replace ', testCase "crypto" test_crypto' ""
         '';
@@ -659,7 +659,9 @@ self: super: builtins.intersectAttrs super {
     let
       # spago requires an older version of megaparsec, but it appears to work
       # fine with newer versions.
-      spagoWithOverrides = doJailbreak super.spago;
+      spagoWithOverrides = doJailbreak (super.spago.override {
+        dhall = self.dhall_1_37_1;
+      });
 
       # This defines the version of the purescript-docs-search release we are using.
       # This is defined in the src/Spago/Prelude.hs file in the spago source.
@@ -785,7 +787,7 @@ self: super: builtins.intersectAttrs super {
     testTarget = "unit-tests";
   };
 
-  haskell-language-server = overrideCabal super.haskell-language-server (drv: {
+  haskell-language-server = enableCabalFlag (enableCabalFlag (overrideCabal super.haskell-language-server (drv: {
     postInstall = let
       inherit (pkgs.lib) concatStringsSep take splitString;
       ghc_version = self.ghc.version;
@@ -800,7 +802,7 @@ self: super: builtins.intersectAttrs super {
       export PATH=$PATH:$PWD/dist/build/haskell-language-server:$PWD/dist/build/haskell-language-server-wrapper
       export HOME=$TMPDIR
     '';
-  });
+  })) "all-plugins") "all-formatters";
 
   # tests depend on a specific version of solc
   hevm = dontCheck (doJailbreak super.hevm);

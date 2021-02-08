@@ -1,4 +1,6 @@
-{ stdenv, fetchurl
+{ lib
+, stdenv
+, fetchurl
 , ncurses
 , withLibrary ? false, libtool
 , unicodeSupport ? true
@@ -10,28 +12,25 @@ assert unicodeSupport -> ncurses.unicode && ncurses != null;
 
 stdenv.mkDerivation rec {
   pname = "dialog";
-  version = "1.3-20201126";
+  version = "1.3-20210117";
 
   src = fetchurl {
-    urls = [
-      "ftp://ftp.invisible-island.net/dialog/${pname}-${version}.tgz"
-      "https://invisible-mirror.net/archives/dialog/${pname}-${version}.tgz"
-    ];
-    sha256 = "sha256-ySM6bI6jOlniN45RRq4r0TtRl0TP22R690IK2sWtOGY=";
+    url = "ftp://ftp.invisible-island.net/dialog/${pname}-${version}.tgz";
+    sha256 = "PB7Qj0S89vFZ8qpv3nZduU6Jl7Pu+0nYtMhmkWk8Q+E=";
   };
 
   buildInputs = [ ncurses ];
 
   configureFlags = [
     "--disable-rpath-hacks"
-    (stdenv.lib.withFeature withLibrary "libtool")
-    "--with-ncurses${stdenv.lib.optionalString unicodeSupport "w"}"
-    "--with-libtool-opts=${stdenv.lib.optionalString enableShared "-shared"}"
+    (lib.withFeature withLibrary "libtool")
+    "--with-ncurses${lib.optionalString unicodeSupport "w"}"
+    "--with-libtool-opts=${lib.optionalString enableShared "-shared"}"
   ];
 
-  installTargets = [ "install${stdenv.lib.optionalString withLibrary "-full"}" ];
+  installTargets = [ "install${lib.optionalString withLibrary "-full"}" ];
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     homepage = "https://invisible-island.net/dialog/dialog.html";
     description = "Display dialog boxes from shell";
     license = licenses.lgpl21Plus;

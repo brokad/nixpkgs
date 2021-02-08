@@ -6,17 +6,19 @@ let
   cfg = config.services.nextcloud;
   fpm = config.services.phpfpm.pools.nextcloud;
 
-  phpPackage =
-    let
-      base = pkgs.php74;
-    in
-      base.buildEnv {
-        extensions = { enabled, all }: with all;
-          enabled ++ [
-            apcu redis memcached imagick
-          ];
-        extraConfig = phpOptionsStr;
-      };
+  phpPackage = pkgs.php74.buildEnv {
+    extensions = { enabled, all }:
+      (with all;
+        enabled
+        ++ [ imagick ] # Always enabled
+        # Optionally enabled depending on caching settings
+        ++ optional cfg.caching.apcu apcu
+        ++ optional cfg.caching.redis redis
+        ++ optional cfg.caching.memcached memcached
+      )
+      ++ cfg.phpExtraExtensions all; # Enabled by user
+    extraConfig = toKeyValue phpOptions;
+  };
 
   toKeyValue = generators.toKeyValue {
     mkKeyValue = generators.mkKeyValueDefault {} " = ";
@@ -27,7 +29,6 @@ let
     post_max_size = cfg.maxUploadSize;
     memory_limit = cfg.maxUploadSize;
   } // cfg.phpOptions;
-  phpOptionsStr = toKeyValue phpOptions;
 
   occ = pkgs.writeScriptBin "nextcloud-occ" ''
     #! ${pkgs.runtimeShell}
@@ -113,6 +114,21 @@ in {
       description = ''
         Enable this option if you plan on using the webfinger plugin.
         The appropriate nginx rewrite rules will be added to your configuration.
+      '';
+    };
+
+    phpExtraExtensions = mkOption {
+      type = with types; functionTo (listOf package);
+      default = all: [];
+      defaultText = "all: []";
+      description = ''
+        Additional PHP extensions to use for nextcloud.
+        By default, only extensions necessary for a vanilla nextcloud installation are enabled,
+        but you may choose from the list of available extensions and add further ones.
+        This is sometimes necessary to be able to install a certain nextcloud app that has additional requirements.
+      '';
+      example = literalExample ''
+        all: [ all.pdlib all.bz2 ]
       '';
     };
 
@@ -228,7 +244,8 @@ in {
         type = types.nullOr types.str;
         default = null;
         description = ''
-          The full path to a file that contains the admin's password.
+          The full path to a file that contains the admin's password. Must be
+          readable by user <literal>nextcloud</literal>.
         '';
       };
 
@@ -466,6 +483,28 @@ in {
           path = [ occ ];
           script = ''
             chmod og+x ${cfg.home}
+
+            ${optionalString (c.dbpassFile != null) ''
+              if [ ! -r "${c.dbpassFile}" ]; then
+                echo "dbpassFile ${c.dbpassFile} is not readable by nextcloud:nextcloud! Aborting..."
+                exit 1
+              fi
+              if [ -z "$(<${c.dbpassFile})" ]; then
+                echo "dbpassFile ${c.dbpassFile} is empty!"
+                exit 1
+              fi
+            ''}
+            ${optionalString (c.adminpassFile != null) ''
+              if [ ! -r "${c.adminpassFile}" ]; then
+                echo "adminpassFile ${c.adminpassFile} is not readable by nextcloud:nextcloud! Aborting..."
+                exit 1
+              fi
+              if [ -z "$(<${c.adminpassFile})" ]; then
+                echo "adminpassFile ${c.adminpassFile} is empty!"
+                exit 1
+              fi
+            ''}
+
             ln -sf ${cfg.package}/apps ${cfg.home}/
 
             # create nextcloud directories.
@@ -511,7 +550,6 @@ in {
         pools.nextcloud = {
           user = "nextcloud";
           group = "nextcloud";
-          phpOptions = phpOptionsStr;
           phpPackage = phpPackage;
           phpEnv = {
             NEXTCLOUD_CONFIG_DIR = "${cfg.home}/config";

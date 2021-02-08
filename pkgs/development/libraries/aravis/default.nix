@@ -20,7 +20,7 @@
 let
   gstreamerAtLeastVersion1 =
     lib.all
-      (pkg: pkg != null && lib.versionAtLeast (stdenv.lib.getVersion pkg) "1.0")
+      (pkg: pkg != null && lib.versionAtLeast (lib.getVersion pkg) "1.0")
       [ gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad ];
 in
   assert enableGstPlugin -> lib.all (pkg: pkg != null) [ gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad ];
@@ -58,7 +58,7 @@ in
       ++ lib.optionals (enableViewer || enableGstPlugin) [ gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad ]
       ++ lib.optionals (enableViewer) [ libnotify gtk3 gnome3.adwaita-icon-theme ];
 
-    preAutoreconf = ''./autogen.sh'';
+    preAutoreconf = "./autogen.sh";
 
     configureFlags =
       lib.optional enableUsb "--enable-usb"

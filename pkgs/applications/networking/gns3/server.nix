@@ -1,6 +1,6 @@
 { stable, branch, version, sha256Hash, mkOverride, commonOverrides }:
 
-{ lib, stdenv, python3, fetchFromGitHub }:
+{ lib, python3, fetchFromGitHub }:
 
 let
   defaultOverrides = commonOverrides ++ [
@@ -34,10 +34,8 @@ in python.pkgs.buildPythonPackage {
   };
 
   postPatch = ''
-    # yarl 1.4+ only requires Python 3.6+
     substituteInPlace requirements.txt \
-      --replace "aiohttp==3.6.2" "aiohttp>=3.6.2" \
-      --replace "yarl==1.3.0" ""
+      --replace "aiohttp==3.6.2" "aiohttp>=3.6.2"
   '';
 
   propagatedBuildInputs = with python.pkgs; [

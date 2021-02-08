@@ -1,4 +1,4 @@
-{ lib, stdenv
+{ lib
 , buildPythonPackage
 , fetchPypi
 }:
@@ -11,6 +11,10 @@ buildPythonPackage rec {
     inherit pname version;
     sha256 = "2dee9ffdd16292878336a58d04a20f0ffe95555465fee7c9bd23b3490ef2abf3";
   };
+
+  doCheck = false; # no tests implemented
+
+  pythonImportsCheck = [ "netifaces" ];
 
   meta = with lib; {
     homepage = "https://alastairs-place.net/projects/netifaces/";
