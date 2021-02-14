@@ -1,6 +1,6 @@
 {
   lib,
-  clangStdenv,
+  stdenv,
   fetchFromGitHub,
   opencl-headers,
   cmake,
@@ -19,9 +19,7 @@
 
 # Note that this requires clang < 9.0 to build, and currently
 # clangStdenv provides clang 7.1 which satisfies the requirement.
-let stdenv = clangStdenv;
-
-in stdenv.mkDerivation rec {
+stdenv.mkDerivation rec {
   pname = "ethminer";
   version = "0.18.0";
 
