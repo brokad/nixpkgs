@@ -7,9 +7,7 @@
 , ruby
 , which
 , fetchFromGitHub
-, fetchgit
 , fetchurl
-, fetchzip
 , fetchpatch
 , llvmPackages
 , rustPlatform
@@ -658,7 +656,7 @@ self: super: {
   });
 
   lf-vim = super.lf-vim.overrideAttrs (old: {
-    dependencies = with super; [ bclose-vim ];
+    dependencies = with super; [ vim-bbye ];
   });
 
   vim-stylish-haskell = super.vim-stylish-haskell.overrideAttrs (old: {
@@ -731,7 +729,7 @@ self: super: {
             libiconv
           ];
 
-          cargoSha256 = "mq5q+cIWXDMeoZfumX1benulrP/AWKZnd8aI0OzY55c=";
+          cargoSha256 = "042dbg80mx0khm8xahm4l490s7bfbav362r0mz5bfhq4fy2s9nsi";
         };
       in
       ''
@@ -739,6 +737,15 @@ self: super: {
       '';
 
     meta.platforms = lib.platforms.all;
+  });
+
+  compe-tabnine = super.compe-tabnine.overrideAttrs (old: {
+    buildInputs = [ tabnine ];
+
+    postFixup = ''
+      mkdir $target/binaries
+      ln -s ${tabnine}/bin/TabNine $target/binaries/TabNine_$(uname -s)
+    '';
   });
 
   completion-tabnine = super.completion-tabnine.overrideAttrs (old: {
@@ -781,6 +788,8 @@ self: super: {
 } // (
   let
     nodePackageNames = [
+      "coc-clangd"
+      "coc-cmake"
       "coc-css"
       "coc-diagnostic"
       "coc-emmet"
@@ -798,6 +807,7 @@ self: super: {
       "coc-metals"
       "coc-pairs"
       "coc-prettier"
+      "coc-pyright"
       "coc-python"
       "coc-r-lsp"
       "coc-rls"
@@ -807,6 +817,7 @@ self: super: {
       "coc-solargraph"
       "coc-stylelint"
       "coc-tabnine"
+      "coc-texlab"
       "coc-tslint"
       "coc-tslint-plugin"
       "coc-tsserver"

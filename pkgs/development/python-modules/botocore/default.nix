@@ -12,11 +12,11 @@
 
 buildPythonPackage rec {
   pname = "botocore";
-  version = "1.20.1"; # N.B: if you change this, change boto3 and awscli to a matching version
+  version = "1.20.12"; # N.B: if you change this, change boto3 and awscli to a matching version
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-lIi6NeLU0XN19nuP0wDfXsL4MXopJAMpAQCcmZ1WO1k=";
+    sha256 = "sha256-OakjFaF6b4vBkU27Ag9S6SnxjluZpPocXYeF+RNCftg=";
   };
 
   propagatedBuildInputs = [
@@ -27,10 +27,6 @@ buildPythonPackage rec {
     simplejson
     urllib3
   ];
-
-  postPatch = ''
-    substituteInPlace setup.py --replace "docutils>=0.10,<0.16" "docutils>=0.10"
-  '';
 
   checkInputs = [ mock nose ];
 

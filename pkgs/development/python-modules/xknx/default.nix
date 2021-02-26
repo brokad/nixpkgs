@@ -11,14 +11,14 @@
 
 buildPythonPackage rec {
   pname = "xknx";
-  version = "0.16.2";
+  version = "0.17.0";
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "XKNX";
     repo = pname;
     rev = version;
-    sha256 = "14cx54ia38ifz7c750i8jxcmnybzwh03ds6hinlwhx8hd2cx9knj";
+    sha256 = "sha256-fzLqkeCfeLNu13R9cp1XVh8fE2B3L47UDpuWOod33gU=";
   };
 
   propagatedBuildInputs = [
