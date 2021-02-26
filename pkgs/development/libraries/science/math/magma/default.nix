@@ -49,12 +49,12 @@ in stdenv.mkDerivation {
 
   buildInputs = [ cudatoolkit libpthreadstubs lapack blas ];
 
-  cmakeFlags = [ "-DGPU_TARGET=${capabilityString}" ];
+  #cmakeFlags = [ "-DGPU_TARGET=${capabilityString}" ];
 
   doCheck = false;
 
-  cmakeFlags = let gpuTargetFlag = concatStringsSep " " gpuTargets;
-               in lists.optional (! isNull gpuTargets) "-DGPU_TARGET=${gpuTargetFlag}";
+  cmakeFlags = let gpuTargetFlag = lib.concatStringsSep " " gpuTargets;
+               in lib.lists.optional (! isNull gpuTargets) "-DGPU_TARGET=${gpuTargetFlag}";
 
   preConfigure = ''
     export CC=${cudatoolkit.cc}/bin/gcc CXX=${cudatoolkit.cc}/bin/g++
