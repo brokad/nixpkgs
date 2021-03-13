@@ -132,9 +132,28 @@ let
         flycheck-rtags = fix-rtags super.flycheck-rtags;
 
         pdf-tools = super.pdf-tools.overrideAttrs (old: {
-          nativeBuildInputs = [ pkgs.pkg-config ];
-          buildInputs = with pkgs; old.buildInputs ++ [ autoconf automake libpng zlib poppler ];
-          preBuild = "make server/epdfinfo";
+          nativeBuildInputs = [
+            pkgs.autoconf
+            pkgs.automake
+            pkgs.pkg-config
+            pkgs.removeReferencesTo
+          ];
+          buildInputs = old.buildInputs ++ [ pkgs.libpng pkgs.zlib pkgs.poppler ];
+          preBuild = ''
+            make server/epdfinfo
+            remove-references-to ${lib.concatStringsSep " " (
+              map (output: "-t " + output) (
+                [
+                  pkgs.glib.dev
+                  pkgs.libpng.dev
+                  pkgs.poppler.dev
+                  pkgs.zlib.dev
+                  pkgs.cairo.dev
+                ]
+                ++ lib.optional pkgs.stdenv.isLinux pkgs.stdenv.cc.libc.dev
+              )
+            )} server/epdfinfo
+          '';
           recipe = pkgs.writeText "recipe" ''
             (pdf-tools
             :repo "politza/pdf-tools" :fetcher github
@@ -298,6 +317,14 @@ let
         telega = super.telega.overrideAttrs (old: {
           buildInputs = old.buildInputs ++ [ pkgs.tdlib ];
           nativeBuildInputs = [ pkgs.pkg-config ];
+
+          patches = [
+            (pkgs.fetchpatch {
+              name = "telega-server-bin-store-prefer.patch";
+              url = "https://github.com/zevlg/telega.el/commit/72550f984ca869309d197203ef7de99182d71729.patch";
+              sha256 = "18xvz53bygksak6h5f8cz79y83p2va15i8qz7n4s3g9gsklmkj2p";
+            })
+          ];
 
           postPatch = ''
             substituteInPlace telega-customize.el \

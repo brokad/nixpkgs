@@ -147,6 +147,11 @@ rec {
     meta.description = "Async wrappers for SSL";
     buildInputs = [ dune-configurator ];
     propagatedBuildInputs = [ async ctypes openssl ];
+    # in ctypes.foreign 0.18.0 threaded and unthreaded have been merged
+    postPatch = ''
+      substituteInPlace bindings/dune \
+        --replace "ctypes.foreign.threaded" "ctypes.foreign"
+    '';
   };
 
   async_unix = janePackage {
@@ -158,7 +163,8 @@ rec {
 
   base = janePackage {
     pname = "base";
-    hash = "1d5ynzzq58g9qammhba5dasrg734p9vndq28a7kg80bdxb8gh3kp";
+    version = "0.14.1";
+    hash = "1hizjxmiqlj2zzkwplzjamw9rbnl0kh44sxgjpzdij99qnfkzylf";
     minimumOCamlVersion = "4.07";
     meta.description = "Full standard library replacement for OCaml";
     buildInputs = [ dune-configurator ];
@@ -239,7 +245,8 @@ rec {
 
   core_kernel = janePackage {
     pname = "core_kernel";
-    hash = "012sp02v35j41lzkvf073620602fgiswz2n224j06mk3bm8jmjms";
+    version = "0.14.1";
+    hash = "0pikg4ln6177gbs0jfix7xj50zlcm7058h64lxnd7wspnj7mq8sd";
     meta.description = "System-independent part of Core";
     buildInputs = [ jst-config ];
     propagatedBuildInputs = [ base_bigstring sexplib ];
