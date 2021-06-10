@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "go-task";
-  version = "3.2.2";
+  version = "3.4.3";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = "task";
     rev = "v${version}";
-    sha256 = "0x94z023rsl7h9prw0i4zkwb5xf2frjz8f15mmcknw48r9ymw598";
+    sha256 = "sha256-hI6x3DOB7pP+umnEFqL0sIx+6qN74sooLdkR2pC74D8=";
   };
 
-  vendorSha256 = "05sh4jbva23ggg2viknl49bwgkhf8dfvsv3rqkl4wwi9ag64qgha";
+  vendorSha256 = "sha256-bsVzV2M31BA7X6aq8na7v56uGYgne4OwR5kz/utmQHI=";
 
   doCheck = false;
 
@@ -22,7 +22,7 @@ buildGoModule rec {
   ];
 
   postInstall = ''
-    mv $out/bin/task $out/bin/go-task
+    ln -s $out/bin/task $out/bin/go-task
   '';
 
   meta = with lib; {

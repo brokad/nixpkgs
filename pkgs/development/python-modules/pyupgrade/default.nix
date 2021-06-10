@@ -8,24 +8,26 @@
 
 buildPythonPackage rec {
   pname = "pyupgrade";
-  version = "2.10.0";
+  version = "2.18.0";
   disabled = isPy27;
 
   src = fetchFromGitHub {
     owner = "asottile";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-XYeqyyfwtS7dHLxeVvmcifW6UCOlnSMxqF1vxezBjT8=";
+    sha256 = "sha256-nkMKy1NAFBG/PuPdj3LAqr0c4UqEM2R2kHKuORql2dw=";
   };
 
-  checkInputs =  [ pytestCheckHook ];
+  checkInputs = [ pytestCheckHook ];
 
   propagatedBuildInputs = [ tokenize-rt ];
 
+  pythonImportsCheck = [ "pyupgrade" ];
+
   meta = with lib; {
-    description = "A tool to automatically upgrade syntax for newer versions of the language";
-    homepage    = "https://github.com/asottile/pyupgrade";
-    license     = licenses.mit;
+    description = "Tool to automatically upgrade syntax for newer versions of the language";
+    homepage = "https://github.com/asottile/pyupgrade";
+    license = licenses.mit;
     maintainers = with maintainers; [ lovesegfault ];
   };
 }

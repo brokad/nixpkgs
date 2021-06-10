@@ -2,13 +2,14 @@
 
 To install the rust compiler and cargo put
 
-```
-rustc
-cargo
+```nix
+environment.systemPackages = [
+  rustc
+  cargo
+];
 ```
 
-into the `environment.systemPackages` or bring them into
-scope with `nix-shell -p rustc cargo`.
+into your `configuration.nix` or bring them into scope with `nix-shell -p rustc cargo`.
 
 For other versions such as daily builds (beta and nightly),
 use either `rustup` from nixpkgs (which will manage the rust installation in your home directory),
@@ -18,7 +19,7 @@ or use Mozilla's [Rust nightlies overlay](#using-the-rust-nightlies-overlay).
 
 Rust applications are packaged by using the `buildRustPackage` helper from `rustPlatform`:
 
-```
+```nix
 { lib, rustPlatform }:
 
 rustPlatform.buildRustPackage rec {
@@ -49,7 +50,7 @@ package. `cargoHash256` is used for traditional Nix SHA-256 hashes,
 such as the one in the example above. `cargoHash` should instead be
 used for [SRI](https://www.w3.org/TR/SRI/) hashes. For example:
 
-```
+```nix
   cargoHash = "sha256-l1vL2ZdtDRxSGvP0X/l3nMw8+6WF67KPutJEzUROjg8=";
 ```
 
@@ -59,21 +60,21 @@ expression and building the package once. The correct checksum can
 then be taken from the failed build. A fake hash can be used for
 `cargoSha256` as follows:
 
-```
+```nix
   cargoSha256 = lib.fakeSha256;
 ```
 
 For `cargoHash` you can use:
 
-```
+```nix
   cargoHash = lib.fakeHash;
 ```
 
 Per the instructions in the [Cargo Book](https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html)
 best practices guide, Rust applications should always commit the `Cargo.lock`
 file in git to ensure a reproducible build. However, a few packages do not, and
-Nix depends on this file, so if it missing you can use `cargoPatches` to apply
-it in the `patchPhase`. Consider sending a PR upstream with a note to the
+Nix depends on this file, so if it is missing you can use `cargoPatches` to
+apply it in the `patchPhase`. Consider sending a PR upstream with a note to the
 maintainer describing why it's important to include in the application.
 
 The fetcher will verify that the `Cargo.lock` file is in sync with the `src`
@@ -106,6 +107,54 @@ rustPlatform.buildRustPackage rec {
 }
 ```
 
+### Importing a `Cargo.lock` file
+
+Using `cargoSha256` or `cargoHash` is tedious when using
+`buildRustPackage` within a project, since it requires that the hash
+is updated after every change to `Cargo.lock`. Therefore,
+`buildRustPackage` also supports vendoring dependencies directly from
+a `Cargo.lock` file using the `cargoLock` argument. For example:
+
+```nix
+rustPlatform.buildRustPackage rec {
+  pname = "myproject";
+  version = "1.0.0";
+
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+  }
+
+  # ...
+}
+```
+
+This will retrieve the dependencies using fixed-output derivations from
+the specified lockfile.
+
+The output hash of each dependency that uses a git source must be
+specified in the `outputHashes` attribute. For example:
+
+```nix
+rustPlatform.buildRustPackage rec {
+  pname = "myproject";
+  version = "1.0.0";
+
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+    outputHashes = {
+      "finalfusion-0.14.0" = "17f4bsdzpcshwh74w5z119xjy2if6l2wgyjy56v621skr2r8y904";
+    };
+  }
+
+  # ...
+}
+```
+
+If you do not specify an output hash for a git dependency, building
+the package will fail and inform you of which crate needs to be
+added. To find the correct hash, you can first use `lib.fakeSha256` or
+`lib.fakeHash` as a stub hash. Building the package (and thus the
+vendored dependencies) will then inform you of the correct hash.
 
 ### Cross compilation
 
@@ -146,6 +195,7 @@ where they are known to differ. But there are ways to customize the argument:
        rustc.platform = { foo = ""; bar = ""; };
      };
    }
+   ```
    will result in:
    ```shell
    --target /nix/store/asdfasdfsadf-thumb-crazy.json # contains {"foo":"","bar":""}
@@ -156,7 +206,7 @@ path) can be passed directly to `buildRustPackage`:
 
 ```nix
 pkgs.rustPlatform.buildRustPackage {
-  (...)
+  /* ... */
   target = "x86_64-fortanix-unknown-sgx";
 }
 ```
@@ -190,6 +240,13 @@ rustPlatform.buildRustPackage {
 
 Please note that the code will be compiled twice here: once in `release` mode
 for the `buildPhase`, and again in `debug` mode for the `checkPhase`.
+
+Test flags, e.g., `--features xxx/yyy`, can be passed to `cargo test` via the
+`cargoTestFlags` attribute.
+
+Another attribute, called `checkFlags`, is used to pass arguments to the test
+binary itself, as stated
+(here)[https://doc.rust-lang.org/cargo/commands/cargo-test.html].
 
 #### Tests relying on the structure of the `target/` directory
 
@@ -254,7 +311,7 @@ Otherwise, some steps may fail because of the modified directory structure of `t
 source code in a reproducible way. If it is missing or out-of-date one can use
 the `cargoPatches` attribute to update or add it.
 
-```
+```nix
 rustPlatform.buildRustPackage rec {
   (...)
   cargoPatches = [
@@ -299,6 +356,37 @@ attributes can also be used:
   the `Cargo.lock`/`Cargo.toml` files need to be patched before
   vendoring.
 
+If a `Cargo.lock` file is available, you can alternatively use the
+`importCargoLock` function. In contrast to `fetchCargoTarball`, this
+function does not require a hash (unless git dependencies are used)
+and fetches every dependency as a separate fixed-output derivation.
+`importCargoLock` can be used as follows:
+
+```
+cargoDeps = rustPlatform.importCargoLock {
+  lockFile = ./Cargo.lock;
+};
+```
+
+If the `Cargo.lock` file includes git dependencies, then their output
+hashes need to be specified since they are not available through the
+lock file. For example:
+
+```
+cargoDeps = rustPlatform.importCargoLock {
+  lockFile = ./Cargo.lock;
+  outputHashes = {
+    "rand-0.8.3" = "0ya2hia3cn31qa8894s3av2s8j5bjwb6yq92k0jsnlx7jid0jwqa";
+  };
+};
+```
+
+If you do not specify an output hash for a git dependency, building
+`cargoDeps` will fail and inform you of which crate needs to be
+added. To find the correct hash, you can first use `lib.fakeSha256` or
+`lib.fakeHash` as a stub hash. Building `cargoDeps` will then inform
+you of the correct hash.
+
 ### Hooks
 
 `rustPlatform` provides the following hooks to automate Cargo builds:
@@ -320,9 +408,10 @@ attributes can also be used:
   variable `buildAndTestSubdir` can be used to build a crate in a
   Cargo workspace. Additional maturin flags can be passed through
   `maturinBuildFlags`.
-* `cargoCheckHook`: run tests using Cargo. Additional flags can be
-  passed to Cargo using `checkFlags` and `checkFlagsArray`. By
-  default, tests are run in parallel. This can be disabled by setting
+* `cargoCheckHook`: run tests using Cargo. The build type for checks
+  can be set using `cargoCheckType`. Additional flags can be passed to
+  the tests using `checkFlags` and `checkFlagsArray`. By default,
+  tests are run in parallel. This can be disabled by setting
   `dontUseCargoParallelTests`.
 * `cargoInstallHook`: install binaries and static/shared libraries
   that were built using `cargoBuildHook`.
@@ -480,7 +569,7 @@ an example for a minimal `hello` crate:
 
 Now, the file produced by the call to `carnix`, called `hello.nix`, looks like:
 
-```
+```nix
 # Generated by carnix 0.6.5: carnix -o hello.nix --src ./. Cargo.lock --standalone
 { stdenv, buildRustCrate, fetchgit }:
 let kernel = stdenv.buildPlatform.parsed.kernel.name;
@@ -509,7 +598,7 @@ dependencies, for instance by adding a single line `libc="*"` to our
 `Cargo.lock`. Then, `carnix` needs to be run again, and produces the
 following nix file:
 
-```
+```nix
 # Generated by carnix 0.6.5: carnix -o hello.nix --src ./. Cargo.lock --standalone
 { stdenv, buildRustCrate, fetchgit }:
 let kernel = stdenv.buildPlatform.parsed.kernel.name;
@@ -564,7 +653,7 @@ Some crates require external libraries. For crates from
 Starting from that file, one can add more overrides, to add features
 or build inputs by overriding the hello crate in a seperate file.
 
-```
+```nix
 with import <nixpkgs> {};
 ((import ./hello.nix).hello {}).override {
   crateOverrides = defaultCrateOverrides // {
@@ -584,7 +673,7 @@ derivation depend on the crate's version, the `attrs` argument of
 the override above can be read, as in the following example, which
 patches the derivation:
 
-```
+```nix
 with import <nixpkgs> {};
 ((import ./hello.nix).hello {}).override {
   crateOverrides = defaultCrateOverrides // {
@@ -605,7 +694,7 @@ dependencies. For instance, to override the build inputs for crate
 `libc` in the example above, where `libc` is a dependency of the main
 crate, we could do:
 
-```
+```nix
 with import <nixpkgs> {};
 ((import hello.nix).hello {}).override {
   crateOverrides = defaultCrateOverrides // {
@@ -621,27 +710,27 @@ general. A number of other parameters can be overridden:
 
 - The version of rustc used to compile the crate:
 
-  ```
+  ```nix
   (hello {}).override { rust = pkgs.rust; };
   ```
 
 - Whether to build in release mode or debug mode (release mode by
   default):
 
-  ```
+  ```nix
   (hello {}).override { release = false; };
   ```
 
 - Whether to print the commands sent to rustc when building
   (equivalent to `--verbose` in cargo:
 
-  ```
+  ```nix
   (hello {}).override { verbose = false; };
   ```
 
 - Extra arguments to be passed to `rustc`:
 
-  ```
+  ```nix
   (hello {}).override { extraRustcOpts = "-Z debuginfo=2"; };
   ```
 
@@ -653,7 +742,7 @@ general. A number of other parameters can be overridden:
   `postInstall`. As an example, here is how to create a new module
   before running the build script:
 
-  ```
+  ```nix
   (hello {}).override {
     preConfigure = ''
        echo "pub const PATH=\"${hi.out}\";" >> src/path.rs"
@@ -667,7 +756,7 @@ One can also supply features switches. For example, if we want to
 compile `diesel_cli` only with the `postgres` feature, and no default
 features, we would write:
 
-```
+```nix
 (callPackage ./diesel.nix {}).diesel {
   default = false;
   postgres = true;
@@ -690,7 +779,7 @@ Using the example `hello` project above, we want to do the following:
 
 A typical `shell.nix` might look like:
 
-```
+```nix
 with import <nixpkgs> {};
 
 stdenv.mkDerivation {
@@ -712,7 +801,7 @@ stdenv.mkDerivation {
 ```
 
 You should now be able to run the following:
-```
+```ShellSesssion
 $ nix-shell --pure
 $ cargo build
 $ cargo test
@@ -722,7 +811,7 @@ $ cargo test
 To control your rust version (i.e. use nightly) from within `shell.nix` (or
 other nix expressions) you can use the following `shell.nix`
 
-```
+```nix
 # Latest Nightly
 with import <nixpkgs> {};
 let src = fetchFromGitHub {
@@ -737,7 +826,7 @@ with import "${src.out}/rust-overlay.nix" pkgs pkgs;
 stdenv.mkDerivation {
   name = "rust-env";
   buildInputs = [
-    # Note: to use use stable, just replace `nightly` with `stable`
+    # Note: to use stable, just replace `nightly` with `stable`
     latest.rustChannels.nightly.rust
 
     # Add some extra dependencies from `pkgs`
@@ -750,7 +839,7 @@ stdenv.mkDerivation {
 ```
 
 Now run:
-```
+```ShellSession
 $ rustc --version
 rustc 1.26.0-nightly (188e693b3 2018-03-26)
 ```
@@ -785,7 +874,7 @@ in the `~/.config/nixpkgs/overlays` directory.
 
 Add the following to your `configuration.nix`, `home-configuration.nix`, `shell.nix`, or similar:
 
-```
+```nix
 { pkgs ? import <nixpkgs> {
     overlays = [
       (import (builtins.fetchTarball https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz))

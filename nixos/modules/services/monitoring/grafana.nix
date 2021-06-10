@@ -15,6 +15,7 @@ let
     SERVER_PROTOCOL = cfg.protocol;
     SERVER_HTTP_ADDR = cfg.addr;
     SERVER_HTTP_PORT = cfg.port;
+    SERVER_SOCKET = cfg.socket;
     SERVER_DOMAIN = cfg.domain;
     SERVER_ROOT_URL = cfg.rootUrl;
     SERVER_STATIC_ROOT_PATH = cfg.staticRootPath;
@@ -41,6 +42,9 @@ let
     AUTH_ANONYMOUS_ENABLED = boolToString cfg.auth.anonymous.enable;
     AUTH_ANONYMOUS_ORG_NAME = cfg.auth.anonymous.org_name;
     AUTH_ANONYMOUS_ORG_ROLE = cfg.auth.anonymous.org_role;
+    AUTH_GOOGLE_ENABLED = boolToString cfg.auth.google.enable;
+    AUTH_GOOGLE_ALLOW_SIGN_UP = boolToString cfg.auth.google.allowSignUp;
+    AUTH_GOOGLE_CLIENT_ID = cfg.auth.google.clientId;
 
     ANALYTICS_REPORTING_ENABLED = boolToString cfg.analytics.reporting.enable;
 
@@ -291,6 +295,12 @@ in {
       type = types.int;
     };
 
+    socket = mkOption {
+      description = "Listening socket.";
+      default = "/run/grafana/grafana.sock";
+      type = types.str;
+    };
+
     domain = mkOption {
       description = "The public facing domain name used to access grafana from a browser.";
       default = "localhost";
@@ -521,23 +531,46 @@ in {
       };
     };
 
-    auth.anonymous = {
-      enable = mkOption {
-        description = "Whether to allow anonymous access.";
-        default = false;
-        type = types.bool;
+    auth = {
+      anonymous = {
+        enable = mkOption {
+          description = "Whether to allow anonymous access.";
+          default = false;
+          type = types.bool;
+        };
+        org_name = mkOption {
+          description = "Which organization to allow anonymous access to.";
+          default = "Main Org.";
+          type = types.str;
+        };
+        org_role = mkOption {
+          description = "Which role anonymous users have in the organization.";
+          default = "Viewer";
+          type = types.str;
+        };
       };
-      org_name = mkOption {
-        description = "Which organization to allow anonymous access to.";
-        default = "Main Org.";
-        type = types.str;
+      google = {
+        enable = mkOption {
+          description = "Whether to allow Google OAuth2.";
+          default = false;
+          type = types.bool;
+        };
+        allowSignUp = mkOption {
+          description = "Whether to allow sign up with Google OAuth2.";
+          default = false;
+          type = types.bool;
+        };
+        clientId = mkOption {
+          description = "Google OAuth2 client ID.";
+          default = "";
+          type = types.str;
+        };
+        clientSecretFile = mkOption {
+          description = "Google OAuth2 client secret.";
+          default = null;
+          type = types.nullOr types.path;
+        };
       };
-      org_role = mkOption {
-        description = "Which role anonymous users have in the organization.";
-        default = "Viewer";
-        type = types.str;
-      };
-
     };
 
     analytics.reporting = {
@@ -602,6 +635,9 @@ in {
         QT_QPA_PLATFORM = "offscreen";
       } // mapAttrs' (n: v: nameValuePair "GF_${n}" (toString v)) envOptions;
       script = ''
+        ${optionalString (cfg.auth.google.clientSecretFile != null) ''
+          export GF_AUTH_GOOGLE_CLIENT_SECRET="$(cat ${escapeShellArg cfg.auth.google.clientSecretFile})"
+        ''}
         ${optionalString (cfg.database.passwordFile != null) ''
           export GF_DATABASE_PASSWORD="$(cat ${escapeShellArg cfg.database.passwordFile})"
         ''}
@@ -622,6 +658,8 @@ in {
       serviceConfig = {
         WorkingDirectory = cfg.dataDir;
         User = "grafana";
+        RuntimeDirectory = "grafana";
+        RuntimeDirectoryMode = "0755";
       };
       preStart = ''
         ln -fs ${cfg.package}/share/grafana/conf ${cfg.dataDir}

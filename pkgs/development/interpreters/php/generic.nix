@@ -7,7 +7,7 @@ let
   generic =
     { callPackage, lib, stdenv, nixosTests, fetchurl, makeWrapper
     , symlinkJoin, writeText, autoconf, automake, bison, flex, libtool
-    , pkg-config, re2c, apacheHttpd, libargon2, libxml2, pcre, pcre2
+    , pkg-config, re2c, apacheHttpd, libargon2, libxml2, pcre2
     , systemd, system-sendmail, valgrind, xcbuild
 
     , version
@@ -103,7 +103,7 @@ let
                 ${extraConfig}
               '';
 
-              phpWithExtensions = symlinkJoin rec {
+              phpWithExtensions = symlinkJoin {
                 name = "php-with-extensions-${version}";
                 inherit (php) version;
                 nativeBuildInputs = [ makeWrapper ];
@@ -124,7 +124,9 @@ let
                 postBuild = ''
                   ln -s ${extraInit} $out/lib/php.ini
 
-                  wrapProgram $out/bin/php --set PHP_INI_SCAN_DIR $out/lib
+                  if test -e $out/bin/php; then
+                    wrapProgram $out/bin/php --set PHP_INI_SCAN_DIR $out/lib
+                  fi
 
                   if test -e $out/bin/php-fpm; then
                     wrapProgram $out/bin/php-fpm --set PHP_INI_SCAN_DIR $out/lib
@@ -140,8 +142,6 @@ let
 
         mkWithExtensions = prevArgs: prevExtensionFunctions: extensions:
           mkBuildEnv prevArgs prevExtensionFunctions { inherit extensions; };
-
-        pcre' = if (lib.versionAtLeast version "7.3") then pcre2 else pcre;
       in
         stdenv.mkDerivation {
           pname = "php";
@@ -155,7 +155,7 @@ let
 
           buildInputs =
             # PCRE extension
-            [ pcre' ]
+            [ pcre2 ]
 
             # Enable sapis
             ++ lib.optional pearSupport [ libxml2.dev ]
@@ -174,10 +174,10 @@ let
             [ "--disable-all" ]
 
             # PCRE
-            ++ lib.optionals (lib.versionAtLeast version "7.4") [ "--with-external-pcre=${pcre'.dev}" ]
-            ++ lib.optionals (lib.versions.majorMinor version == "7.3") [ "--with-pcre-regex=${pcre'.dev}" ]
-            ++ lib.optionals (lib.versionOlder version "7.3") [ "--with-pcre-regex=${pcre'.dev}" ]
-            ++ [ "PCRE_LIBDIR=${pcre'}" ]
+            ++ lib.optionals (lib.versionAtLeast version "7.4") [ "--with-external-pcre=${pcre2.dev}" ]
+            ++ lib.optionals (lib.versions.majorMinor version == "7.3") [ "--with-pcre-regex=${pcre2.dev}" ]
+            ++ lib.optionals (lib.versionOlder version "7.3") [ "--with-pcre-regex=${pcre2.dev}" ]
+            ++ [ "PCRE_LIBDIR=${pcre2}" ]
 
 
             # Enable sapis
@@ -190,7 +190,7 @@ let
               "--with-libxml-dir=${libxml2.dev}"
             ]
             ++ lib.optional pharSupport   "--enable-phar"
-            ++ lib.optional phpdbgSupport "--enable-phpdbg"
+            ++ lib.optional (!phpdbgSupport) "--disable-phpdbg"
 
 
             # Misc flags
