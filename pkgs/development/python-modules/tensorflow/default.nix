@@ -122,6 +122,7 @@ let
       })
       # Relax too strict Python packages versions dependencies.
       ./relax-dependencies.patch
+      ./dont_check_soname.patch
       # Add missing `io_bazel_rules_docker` dependency.
       ./workspace.patch
     ];

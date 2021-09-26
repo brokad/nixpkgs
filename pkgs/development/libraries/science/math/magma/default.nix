@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, cmake, gfortran, ninja, cudatoolkit, libpthreadstubs, lapack, blas }:
+{ lib, stdenv, fetchurl, cmake, gfortran, ninja, cudatoolkit, libpthreadstubs, lapack, blas, gpuTargets ? null }:
 
 assert let majorIs = lib.versions.major cudatoolkit.version;
        in majorIs == "9" || majorIs == "10" || majorIs == "11";
@@ -49,7 +49,10 @@ in stdenv.mkDerivation {
 
   buildInputs = [ cudatoolkit libpthreadstubs lapack blas ];
 
-  cmakeFlags = [ "-DGPU_TARGET=${capabilityString}" ];
+  # cmakeFlags = [ "-DGPU_TARGET=${capabilityString}" ];
+
+  cmakeFlags = let gpuTargetFlag = lib.concatStringsSep " " gpuTargets;
+               in lib.lists.optional (! isNull gpuTargets) "-DGPU_TARGET=${gpuTargetFlag}";
 
   doCheck = false;
 

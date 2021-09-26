@@ -23,6 +23,7 @@ stdenv.mkDerivation rec {
 
   makeFlags = [
     "CUDA_HOME=${cudatoolkit}"
+    "NVCC_GENCODE=-gencode=arch=compute_80,code=sm_80"
     "PREFIX=$(out)"
   ];
 
@@ -32,6 +33,11 @@ stdenv.mkDerivation rec {
     # Set RUNPATH so that libnvidia-ml in /run/opengl-driver(-32)/lib can be found.
     # See the explanation in addOpenGLRunpath.
     addOpenGLRunpath $out/lib/lib*.so
+  '';
+
+  preBuild = ''
+  cat /build/source/build/obj/collectives/device/Makefile.rules
+  exit 1
   '';
 
   NIX_CFLAGS_COMPILE = [ "-Wno-unused-function" ];
